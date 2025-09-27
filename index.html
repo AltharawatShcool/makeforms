@@ -9,9 +9,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <style>
@@ -19,79 +16,131 @@
             font-family: 'Segoe UI', 'Cairo', Tahoma, Geneva, Verdana, sans-serif; 
             overflow-x: hidden;
         }
-        .gradient-bg { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-        }
-        .card-shadow { 
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); 
-        }
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
+        
+        /* Sidebar Styles */
         .sidebar {
-            transition: transform 0.3s ease-in-out;
-            transform: translateX(-100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(100%);
+            backdrop-filter: blur(10px);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
         }
+        
         .sidebar.open {
             transform: translateX(0);
         }
+        
+        .sidebar-overlay {
+            transition: opacity 0.3s ease-in-out;
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        @media (min-width: 1024px) {
+            .sidebar {
+                transform: translateX(0) !important;
+                position: relative !important;
+                backdrop-filter: none;
+                border-left: none;
+                border-left: 1px solid #e5e7eb;
+            }
+            .sidebar-overlay {
+                display: none !important;
+            }
+            .main-content {
+                margin-right: 280px;
+            }
+        }
+        
+        /* Professional Animations */
         .animate-fade-in {
-            animation: fadeIn 0.5s ease-in-out;
+            animation: fadeIn 0.6s ease-out;
         }
+        
         .animate-slide-up {
-            animation: slideUp 0.3s ease-out;
+            animation: slideUp 0.4s ease-out;
         }
+        
+        .animate-scale-in {
+            animation: scaleIn 0.3s ease-out;
+        }
+        
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+        
         @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
+            from { transform: translateY(30px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-        .form-template {
-            background: #fefefe;
-            border: 2px solid #e5e7eb;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
-        .form-template.dark {
-            background: #1f2937;
-            border: 2px solid #374151;
+        
+        /* Navigation Styles */
+        .nav-btn {
+            position: relative;
+            overflow: hidden;
         }
-        .loading-spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
+        
+        .nav-btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+            z-index: -1;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        
+        .nav-btn.active:before,
+        .nav-btn:hover:before {
+            width: 100%;
         }
-        @media print {
-            .no-print { display: none !important; }
-            body { -webkit-print-color-adjust: exact; }
-            .print-page { page-break-after: always; }
+        
+        .nav-btn.active {
+            color: white;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
-        .notification {
-            transition: all 0.3s ease-in-out;
+        
+        /* Card Styles */
+        .card-shadow { 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
         }
-        .notification.hide {
-            transform: translateX(100%);
-            opacity: 0;
+        
+        .card-shadow:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
         }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .progress-bar {
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        
+        /* Stats Cards */
+        .stats-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
         }
+        
+        .dark .stats-card {
+            background: linear-gradient(135deg, rgba(31, 41, 55, 0.9) 0%, rgba(31, 41, 55, 0.7) 100%);
+            border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+        
+        /* Form Elements */
         .input-group {
             position: relative;
         }
+        
         .input-group label {
             position: absolute;
             top: -8px;
@@ -101,20 +150,129 @@
             font-size: 12px;
             color: #667eea;
             font-weight: 600;
+            z-index: 10;
         }
+        
         .dark .input-group label {
             background: #1f2937;
             color: #a5b4fc;
         }
-        .stats-card {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border-left: 4px solid #667eea;
+        
+        /* Table Styles */
+        .table-hover tbody tr {
+            transition: all 0.2s ease;
         }
+        
         .table-hover tbody tr:hover {
             background-color: rgba(102, 126, 234, 0.05);
+            transform: translateX(-2px);
         }
+        
         .dark .table-hover tbody tr:hover {
             background-color: rgba(102, 126, 234, 0.1);
+        }
+        
+        /* Loading Animation */
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Notification Styles */
+        .notification {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .notification.hide {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        
+        /* Form Templates */
+        .form-template {
+            background: #fefefe;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+        
+        .form-template.dark {
+            background: #1f2937;
+            border: 1px solid #374151;
+        }
+        
+        /* Section Content */
+        .section-content {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
+        }
+        
+        .section-content.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Progress Indicators */
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 4px;
+            border-radius: 2px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .grid-cols-md-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .text-responsive {
+                font-size: 0.875rem;
+            }
+        }
+        
+        /* Print Styles */
+        @media print {
+            .no-print { display: none !important; }
+            body { -webkit-print-color-adjust: exact; }
+            .print-page { page-break-after: always; }
+            .sidebar, .sidebar-overlay { display: none !important; }
+            .main-content { margin-right: 0 !important; }
+        }
+        
+        /* Dark Mode Enhancements */
+        .dark {
+            --tw-bg-opacity: 1;
+            background-color: rgb(17 24 39 / var(--tw-bg-opacity));
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5a6fd8;
         }
     </style>
     
@@ -131,6 +289,9 @@
                         arabic: ['Segoe UI', 'Cairo', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'] 
                     },
                     animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-up': 'slideUp 0.4s ease-out',
+                        'scale-in': 'scaleIn 0.3s ease-out',
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     }
                 }
@@ -143,64 +304,70 @@
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-all duration-300">
     <!-- Loading Screen -->
     <div id="loading-screen" class="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex items-center justify-center">
-        <div class="text-center">
+        <div class="text-center animate-scale-in">
             <div class="loading-spinner mx-auto mb-4"></div>
             <p class="text-lg font-medium text-primary">جاري تحميل النظام...</p>
+            <div class="progress-bar w-32 mx-auto mt-4"></div>
         </div>
     </div>
 
-    <!-- Mobile Sidebar Overlay -->
-    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden hidden"></div>
+    <!-- Sidebar Overlay -->
+    <div id="sidebar-overlay" class="sidebar-overlay fixed inset-0 bg-black bg-opacity-60 z-40 lg:hidden"></div>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar fixed right-0 top-0 h-full w-80 bg-white dark:bg-gray-800 shadow-2xl z-50 lg:transform-none lg:translate-x-0 lg:static lg:w-64">
+    <aside id="sidebar" class="sidebar fixed right-0 top-0 h-full w-80 bg-white dark:bg-gray-800 shadow-2xl z-50 lg:w-72">
+        <!-- Sidebar Header -->
         <div class="p-6 border-b border-gray-200 dark:border-gray-700">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3 space-x-reverse">
-                    <div class="w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
-                        <i class="fas fa-users text-white"></i>
+                    <div class="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-users text-white text-xl"></i>
                     </div>
                     <div>
                         <h2 class="text-lg font-bold text-primary">نظام الموارد البشرية</h2>
                         <p class="text-sm text-gray-500 dark:text-gray-400">الإدارة المتكاملة</p>
                     </div>
                 </div>
-                <button onclick="toggleSidebar()" class="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
         </div>
 
-        <nav class="p-4 space-y-2">
-            <button onclick="showSection('dashboard')" class="nav-btn w-full text-right p-4 rounded-lg transition-all flex items-center space-x-3 space-x-reverse hover:bg-gray-100 dark:hover:bg-gray-700">
-                <i class="fas fa-chart-dashboard w-5"></i>
-                <span>لوحة التحكم</span>
+        <!-- Navigation Menu -->
+        <nav class="p-4 space-y-1 flex-1 overflow-y-auto">
+            <button onclick="showSection('dashboard')" class="nav-btn w-full text-right p-4 rounded-xl transition-all flex items-center space-x-3 space-x-reverse hover:bg-gray-50 dark:hover:bg-gray-700">
+                <i class="fas fa-chart-dashboard w-5 text-lg"></i>
+                <span class="font-medium">لوحة التحكم</span>
             </button>
-            <button onclick="showSection('employees')" class="nav-btn w-full text-right p-4 rounded-lg transition-all flex items-center space-x-3 space-x-reverse hover:bg-gray-100 dark:hover:bg-gray-700">
-                <i class="fas fa-users w-5"></i>
-                <span>إدارة الموظفين</span>
+            
+            <button onclick="showSection('employees')" class="nav-btn w-full text-right p-4 rounded-xl transition-all flex items-center space-x-3 space-x-reverse hover:bg-gray-50 dark:hover:bg-gray-700">
+                <i class="fas fa-users w-5 text-lg"></i>
+                <span class="font-medium">إدارة الموظفين</span>
             </button>
-            <button onclick="showSection('forms')" class="nav-btn w-full text-right p-4 rounded-lg transition-all flex items-center space-x-3 space-x-reverse hover:bg-gray-100 dark:hover:bg-gray-700">
-                <i class="fas fa-file-alt w-5"></i>
-                <span>النماذج والتقارير</span>
+            
+            <button onclick="showSection('forms')" class="nav-btn w-full text-right p-4 rounded-xl transition-all flex items-center space-x-3 space-x-reverse hover:bg-gray-50 dark:hover:bg-gray-700">
+                <i class="fas fa-file-alt w-5 text-lg"></i>
+                <span class="font-medium">النماذج والتقارير</span>
             </button>
-            <button onclick="showSection('analytics')" class="nav-btn w-full text-right p-4 rounded-lg transition-all flex items-center space-x-3 space-x-reverse hover:bg-gray-100 dark:hover:bg-gray-700">
-                <i class="fas fa-chart-line w-5"></i>
-                <span>التحليلات والإحصائيات</span>
+            
+
+            
+            <button onclick="showSection('settings')" class="nav-btn w-full text-right p-4 rounded-xl transition-all flex items-center space-x-3 space-x-reverse hover:bg-gray-50 dark:hover:bg-gray-700">
+                <i class="fas fa-cog w-5 text-lg"></i>
+                <span class="font-medium">إعدادات النظام</span>
             </button>
-            <button onclick="showSection('settings')" class="nav-btn w-full text-right p-4 rounded-lg transition-all flex items-center space-x-3 space-x-reverse hover:bg-gray-100 dark:hover:bg-gray-700">
-                <i class="fas fa-cog w-5"></i>
-                <span>إعدادات النظام</span>
-            </button>
-            <button onclick="showSection('backup')" class="nav-btn w-full text-right p-4 rounded-lg transition-all flex items-center space-x-3 space-x-reverse hover:bg-gray-100 dark:hover:bg-gray-700">
-                <i class="fas fa-database w-5"></i>
-                <span>النسخ الاحتياطي</span>
+            
+            <button onclick="showSection('backup')" class="nav-btn w-full text-right p-4 rounded-xl transition-all flex items-center space-x-3 space-x-reverse hover:bg-gray-50 dark:hover:bg-gray-700">
+                <i class="fas fa-database w-5 text-lg"></i>
+                <span class="font-medium">النسخ الاحتياطي</span>
             </button>
         </nav>
 
-        <div class="absolute bottom-4 left-4 right-4">
-            <div class="bg-gradient-to-r from-primary to-secondary p-4 rounded-lg text-white text-center">
-                <i class="fas fa-shield-alt text-2xl mb-2"></i>
+        <!-- Sidebar Footer -->
+        <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+            <div class="bg-gradient-to-r from-primary to-secondary p-4 rounded-xl text-white text-center">
+                <i class="fas fa-shield-alt text-2xl mb-2 block"></i>
                 <p class="text-sm font-medium">نظام آمن ومحمي</p>
                 <p class="text-xs opacity-90">تشفير البيانات 256-bit</p>
             </div>
@@ -208,103 +375,109 @@
     </aside>
 
     <!-- Main Content -->
-    <div class="lg:mr-64">
+    <div class="main-content min-h-screen">
         <!-- Header -->
-        <header class="bg-white dark:bg-gray-800 shadow-lg border-b border-gray-200 dark:border-gray-700">
-            <div class="px-6 py-4">
+        <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-30">
+            <div class="px-4 sm:px-6 py-4">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-4 space-x-reverse">
-                        <button onclick="toggleSidebar()" class="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                             <i class="fas fa-bars text-xl"></i>
                         </button>
                         <div>
-                            <h1 id="page-title" class="text-2xl font-bold text-gray-900 dark:text-white">لوحة التحكم</h1>
+                            <h1 id="page-title" class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">لوحة التحكم</h1>
                             <p id="page-subtitle" class="text-sm text-gray-500 dark:text-gray-400">مرحباً بك في نظام إدارة الموارد البشرية</p>
                         </div>
                     </div>
-                    <div class="flex items-center space-x-4 space-x-reverse">
+                    
+                    <div class="flex items-center space-x-3 space-x-reverse">
                         <button onclick="toggleTheme()" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                             <i id="theme-icon" class="fas fa-moon text-gray-600 dark:text-gray-300"></i>
                         </button>
-                        <div class="flex items-center space-x-2 space-x-reverse bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 px-3 py-1 rounded-full">
+                        
+                        <div class="hidden sm:flex items-center space-x-2 space-x-reverse bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 px-3 py-1 rounded-full">
                             <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                             <span class="text-sm font-medium">متصل</span>
                         </div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400" id="current-time"></div>
+                        
+                        <div class="hidden md:block text-sm text-gray-500 dark:text-gray-400" id="current-time"></div>
                     </div>
                 </div>
             </div>
         </header>
 
         <!-- Main Content Area -->
-        <main class="p-6">
+        <main class="p-4 sm:p-6">
             <!-- Dashboard Section -->
             <section id="dashboard-section" class="section-content">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <!-- Stats Cards -->
-                    <div class="stats-card bg-white dark:bg-gray-800 p-6 rounded-xl card-shadow animate-fade-in">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                    <div class="stats-card p-4 sm:p-6 rounded-xl card-shadow animate-fade-in">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">إجمالي الموظفين</p>
-                                <p id="total-employees" class="text-3xl font-bold text-primary">0</p>
+                                <p id="total-employees" class="text-2xl sm:text-3xl font-bold text-primary">0</p>
                             </div>
-                            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
+                            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-xl flex items-center justify-center">
                                 <i class="fas fa-users text-blue-600 dark:text-blue-400 text-xl"></i>
                             </div>
                         </div>
                     </div>
 
-                    <div class="stats-card bg-white dark:bg-gray-800 p-6 rounded-xl card-shadow animate-fade-in">
+                    <div class="stats-card p-4 sm:p-6 rounded-xl card-shadow animate-fade-in">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">النماذج المولدة</p>
-                                <p id="total-forms" class="text-3xl font-bold text-green-600">0</p>
+                                <p id="total-forms" class="text-2xl sm:text-3xl font-bold text-green-600">0</p>
                             </div>
-                            <div class="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center">
+                            <div class="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-xl flex items-center justify-center">
                                 <i class="fas fa-file-alt text-green-600 dark:text-green-400 text-xl"></i>
                             </div>
                         </div>
                     </div>
 
-                    <div class="stats-card bg-white dark:bg-gray-800 p-6 rounded-xl card-shadow animate-fade-in">
+                    <div class="stats-card p-4 sm:p-6 rounded-xl card-shadow animate-fade-in">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">الإجازات المعلقة</p>
-                                <p id="pending-leaves" class="text-3xl font-bold text-yellow-600">0</p>
+                                <p id="pending-leaves" class="text-2xl sm:text-3xl font-bold text-yellow-600">0</p>
                             </div>
-                            <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/20 rounded-lg flex items-center justify-center">
+                            <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/20 rounded-xl flex items-center justify-center">
                                 <i class="fas fa-clock text-yellow-600 dark:text-yellow-400 text-xl"></i>
                             </div>
                         </div>
                     </div>
 
-                    <div class="stats-card bg-white dark:bg-gray-800 p-6 rounded-xl card-shadow animate-fade-in">
+                    <div class="stats-card p-4 sm:p-6 rounded-xl card-shadow animate-fade-in">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">الموظفين الجدد</p>
-                                <p id="new-employees" class="text-3xl font-bold text-purple-600">0</p>
+                                <p id="new-employees" class="text-2xl sm:text-3xl font-bold text-purple-600">0</p>
                             </div>
-                            <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center">
+                            <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/20 rounded-xl flex items-center justify-center">
                                 <i class="fas fa-user-plus text-purple-600 dark:text-purple-400 text-xl"></i>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Quick Actions -->
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                <!-- Quick Actions & Recent Activity -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-xl card-shadow">
-                        <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">إجراءات سريعة</h3>
+                        <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white flex items-center">
+                            <i class="fas fa-bolt text-primary ml-2"></i>
+                            إجراءات سريعة
+                        </h3>
                         <div class="space-y-3">
-                            <button onclick="showAddEmployeeModal()" class="w-full bg-primary hover:bg-blue-600 text-white p-3 rounded-lg transition-all flex items-center justify-center space-x-2 space-x-reverse">
+                            <button onclick="showAddEmployeeModal()" class="w-full bg-gradient-to-r from-primary to-secondary hover:from-blue-600 hover:to-purple-600 text-white p-3 rounded-xl transition-all flex items-center justify-center space-x-2 space-x-reverse font-medium">
                                 <i class="fas fa-user-plus"></i>
                                 <span>إضافة موظف جديد</span>
                             </button>
-                            <button onclick="showSection('forms')" class="w-full bg-green-500 hover:bg-green-600 text-white p-3 rounded-lg transition-all flex items-center justify-center space-x-2 space-x-reverse">
+                            <button onclick="showSection('forms')" class="w-full bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white p-3 rounded-xl transition-all flex items-center justify-center space-x-2 space-x-reverse font-medium">
                                 <i class="fas fa-file-plus"></i>
                                 <span>إنشاء نموذج جديد</span>
                             </button>
-                            <button onclick="exportAllData()" class="w-full bg-orange-500 hover:bg-orange-600 text-white p-3 rounded-lg transition-all flex items-center justify-center space-x-2 space-x-reverse">
+                            <button onclick="exportAllData()" class="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white p-3 rounded-xl transition-all flex items-center justify-center space-x-2 space-x-reverse font-medium">
                                 <i class="fas fa-download"></i>
                                 <span>تصدير البيانات</span>
                             </button>
@@ -312,14 +485,26 @@
                     </div>
 
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-xl card-shadow">
-                        <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">النشاط الأخير</h3>
+                        <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white flex items-center">
+                            <i class="fas fa-history text-primary ml-2"></i>
+                            النشاط الأخير
+                        </h3>
                         <div id="recent-activity" class="space-y-3">
-                            <!-- Activity items will be inserted here -->
+                            <div class="flex items-center space-x-3 space-x-reverse p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <div class="flex-1">
+                                    <p class="text-sm text-gray-900 dark:text-white">تم تحميل النظام بنجاح</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">الآن</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-xl card-shadow">
-                        <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">الإحصائيات السريعة</h3>
+                        <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white flex items-center">
+                            <i class="fas fa-chart-pie text-primary ml-2"></i>
+                            الإحصائيات السريعة
+                        </h3>
                         <canvas id="quick-chart" width="300" height="200"></canvas>
                     </div>
                 </div>
@@ -327,20 +512,21 @@
 
             <!-- Employees Section -->
             <section id="employees-section" class="section-content">
-                <div class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 mb-6">
-                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
-                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 lg:mb-0">إدارة الموظفين</h2>
-                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 sm:space-x-reverse">
-                            <button onclick="showAddEmployeeModal()" class="bg-primary hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-all flex items-center justify-center space-x-2 space-x-reverse">
+                <div class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-4 sm:p-6 mb-6">
+                    <!-- Header -->
+                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 space-y-4 lg:space-y-0">
+                        <h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">إدارة الموظفين</h2>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <button onclick="showAddEmployeeModal()" class="bg-primary hover:bg-blue-600 text-white px-4 py-2.5 rounded-lg transition-all flex items-center justify-center space-x-2 space-x-reverse font-medium">
                                 <i class="fas fa-user-plus"></i>
                                 <span>إضافة موظف</span>
                             </button>
-                            <label class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition-all cursor-pointer flex items-center justify-center space-x-2 space-x-reverse">
+                            <label class="bg-green-500 hover:bg-green-600 text-white px-4 py-2.5 rounded-lg transition-all cursor-pointer flex items-center justify-center space-x-2 space-x-reverse font-medium">
                                 <i class="fas fa-file-import"></i>
                                 <span>استيراد Excel</span>
                                 <input type="file" id="excel-file" accept=".xlsx,.xls" class="hidden">
                             </label>
-                            <button onclick="exportEmployeesToExcel()" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg transition-all flex items-center justify-center space-x-2 space-x-reverse">
+                            <button onclick="exportEmployeesToExcel()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 rounded-lg transition-all flex items-center justify-center space-x-2 space-x-reverse font-medium">
                                 <i class="fas fa-file-export"></i>
                                 <span>تصدير Excel</span>
                             </button>
@@ -348,26 +534,26 @@
                     </div>
 
                     <!-- Search and Filter -->
-                    <div class="grid md:grid-cols-4 gap-4 mb-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                         <div class="input-group">
                             <label>البحث</label>
-                            <input type="text" id="search-employees" placeholder="ابحث عن موظف..." class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white">
+                            <input type="text" id="search-employees" placeholder="ابحث عن موظف..." class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
                         </div>
                         <div class="input-group">
                             <label>القسم</label>
-                            <select id="filter-department" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white">
+                            <select id="filter-department" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
                                 <option value="">جميع الأقسام</option>
                             </select>
                         </div>
                         <div class="input-group">
                             <label>المسمى الوظيفي</label>
-                            <select id="filter-position" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white">
+                            <select id="filter-position" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
                                 <option value="">جميع المناصب</option>
                             </select>
                         </div>
                         <div class="input-group">
                             <label>الحالة</label>
-                            <select id="filter-status" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white">
+                            <select id="filter-status" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
                                 <option value="">جميع الحالات</option>
                                 <option value="active">نشط</option>
                                 <option value="inactive">غير نشط</option>
@@ -381,20 +567,20 @@
                         <table class="w-full text-base text-right table-hover">
                             <thead class="bg-gray-50 dark:bg-gray-700">
                                 <tr>
-                                    <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    <th class="px-4 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         <input type="checkbox" id="select-all-employees" class="rounded border-gray-300">
                                     </th>
-                                    <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:text-primary" onclick="sortTable('name')">
+                                    <th class="px-4 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:text-primary transition-colors" onclick="sortTable('name')">
                                         الاسم <i class="fas fa-sort"></i>
                                     </th>
-                                    <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:text-primary" onclick="sortTable('employeeId')">
+                                    <th class="px-4 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:text-primary transition-colors" onclick="sortTable('employeeId')">
                                         الرقم الوظيفي <i class="fas fa-sort"></i>
                                     </th>
-                                    <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">المسمى الوظيفي</th>
-                                    <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">القسم</th>
-                                    <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">تاريخ التعيين</th>
-                                    <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">الحالة</th>
-                                    <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">الإجراءات</th>
+                                    <th class="px-4 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">المسمى الوظيفي</th>
+                                    <th class="px-4 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">القسم</th>
+                                    <th class="px-4 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">تاريخ التعيين</th>
+                                    <th class="px-4 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">الحالة</th>
+                                    <th class="px-4 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">الإجراءات</th>
                                 </tr>
                             </thead>
                             <tbody id="employees-table-body" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -404,18 +590,18 @@
                     </div>
 
                     <!-- Pagination -->
-                    <div class="flex items-center justify-between mt-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-6 space-y-4 sm:space-y-0">
                         <div class="text-sm text-gray-700 dark:text-gray-300">
                             عرض <span id="showing-from">1</span> إلى <span id="showing-to">10</span> من <span id="total-records">0</span> موظف
                         </div>
                         <div class="flex space-x-2 space-x-reverse">
-                            <button onclick="previousPage()" id="prev-btn" class="px-3 py-2 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50">
+                            <button onclick="previousPage()" id="prev-btn" class="px-3 py-2 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 transition-colors">
                                 السابق
                             </button>
                             <div id="page-numbers" class="flex space-x-1 space-x-reverse">
                                 <!-- Page numbers will be inserted here -->
                             </div>
-                            <button onclick="nextPage()" id="next-btn" class="px-3 py-2 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50">
+                            <button onclick="nextPage()" id="next-btn" class="px-3 py-2 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 transition-colors">
                                 التالي
                             </button>
                         </div>
@@ -426,88 +612,132 @@
             <!-- Forms Section -->
             <section id="forms-section" class="section-content">
                 <div class="grid lg:grid-cols-4 gap-6">
-                    <!-- Employee and Form Selection -->
+                    <!-- Form Selection Panel -->
                     <div class="lg:col-span-1">
-                        <div class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 sticky top-6">
-                            <h3 class="text-xl font-bold mb-6 text-primary">إعداد النموذج</h3>
+                        <div class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 sticky top-24">
+                            <h3 class="text-xl font-bold mb-6 text-primary flex items-center">
+                                <i class="fas fa-cogs ml-2"></i>
+                                إعداد النموذج
+                            </h3>
                             
                             <div class="space-y-6">
                                 <div class="input-group">
                                     <label>اختر الموظف</label>
-                                    <select id="employee-select" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white">
+                                    <select id="employee-select" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
                                         <option value="">اختر موظف...</option>
                                     </select>
                                 </div>
 
                                 <div>
-                                    <h4 class="font-semibold mb-4 text-gray-900 dark:text-white">نوع النموذج</h4>
-                                    <div class="grid grid-cols-1 gap-3">
-                                        <button onclick="generateForm('start-work')" class="form-type-btn p-4 text-right bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 border border-blue-200 dark:border-blue-800 rounded-lg transition-all">
+                                    <h4 class="font-semibold mb-4 text-gray-900 dark:text-white">أنواع النماذج</h4>
+                                    <div class="space-y-3">
+                                        <!-- Form Type Buttons -->
+                                        <button onclick="generateForm('start-work')" class="form-type-btn w-full p-4 text-right bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 border border-blue-200 dark:border-blue-800 rounded-lg transition-all">
                                             <div class="flex items-center space-x-3 space-x-reverse">
                                                 <i class="fas fa-briefcase text-blue-600 dark:text-blue-400"></i>
-                                                <div>
+                                                <div class="text-right">
                                                     <div class="font-medium">مباشرة عمل</div>
                                                     <div class="text-xs text-gray-500">إشعار بدء الخدمة</div>
                                                 </div>
                                             </div>
                                         </button>
 
-                                        <button onclick="generateForm('vacation')" class="form-type-btn p-4 text-right bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/40 border border-green-200 dark:border-green-800 rounded-lg transition-all">
+                                        <button onclick="generateForm('vacation')" class="form-type-btn w-full p-4 text-right bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/40 border border-green-200 dark:border-green-800 rounded-lg transition-all">
                                             <div class="flex items-center space-x-3 space-x-reverse">
                                                 <i class="fas fa-umbrella-beach text-green-600 dark:text-green-400"></i>
-                                                <div>
+                                                <div class="text-right">
                                                     <div class="font-medium">طلب إجازة</div>
                                                     <div class="text-xs text-gray-500">طلب إجازة رسمي</div>
                                                 </div>
                                             </div>
                                         </button>
 
-                                        <button onclick="generateForm('custody')" class="form-type-btn p-4 text-right bg-yellow-50 hover:bg-yellow-100 dark:bg-yellow-900/20 dark:hover:bg-yellow-900/40 border border-yellow-200 dark:border-yellow-800 rounded-lg transition-all">
-                                            <div class="flex items-center space-x-3 space-x-reverse">
-                                                <i class="fas fa-handshake text-yellow-600 dark:text-yellow-400"></i>
-                                                <div>
-                                                    <div class="font-medium">تسليم واستلام عهدة</div>
-                                                    <div class="text-xs text-gray-500">محضر تسليم</div>
-                                                </div>
-                                            </div>
-                                        </button>
-
-                                        <button onclick="generateForm('resignation')" class="form-type-btn p-4 text-right bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 border border-red-200 dark:border-red-800 rounded-lg transition-all">
-                                            <div class="flex items-center space-x-3 space-x-reverse">
-                                                <i class="fas fa-sign-out-alt text-red-600 dark:text-red-400"></i>
-                                                <div>
-                                                    <div class="font-medium">استقالة</div>
-                                                    <div class="text-xs text-gray-500">طلب استقالة</div>
-                                                </div>
-                                            </div>
-                                        </button>
-
-                                        <button onclick="generateForm('termination')" class="form-type-btn p-4 text-right bg-gray-50 hover:bg-gray-100 dark:bg-gray-900/20 dark:hover:bg-gray-900/40 border border-gray-200 dark:border-gray-800 rounded-lg transition-all">
-                                            <div class="flex items-center space-x-3 space-x-reverse">
-                                                <i class="fas fa-user-times text-gray-600 dark:text-gray-400"></i>
-                                                <div>
-                                                    <div class="font-medium">إنهاء خدمات</div>
-                                                    <div class="text-xs text-gray-500">إنهاء الخدمة</div>
-                                                </div>
-                                            </div>
-                                        </button>
-
-                                        <button onclick="generateForm('salary-certificate')" class="form-type-btn p-4 text-right bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/20 dark:hover:bg-purple-900/40 border border-purple-200 dark:border-purple-800 rounded-lg transition-all">
+                                        <button onclick="generateForm('salary-certificate')" class="form-type-btn w-full p-4 text-right bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/20 dark:hover:bg-purple-900/40 border border-purple-200 dark:border-purple-800 rounded-lg transition-all">
                                             <div class="flex items-center space-x-3 space-x-reverse">
                                                 <i class="fas fa-file-invoice-dollar text-purple-600 dark:text-purple-400"></i>
-                                                <div>
+                                                <div class="text-right">
                                                     <div class="font-medium">شهادة راتب</div>
                                                     <div class="text-xs text-gray-500">إثبات راتب</div>
                                                 </div>
                                             </div>
                                         </button>
 
-                                        <button onclick="generateForm('experience-certificate')" class="form-type-btn p-4 text-right bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/40 border border-indigo-200 dark:border-indigo-800 rounded-lg transition-all">
+                                        <button onclick="generateForm('experience-certificate')" class="form-type-btn w-full p-4 text-right bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/40 border border-indigo-200 dark:border-indigo-800 rounded-lg transition-all">
                                             <div class="flex items-center space-x-3 space-x-reverse">
                                                 <i class="fas fa-medal text-indigo-600 dark:text-indigo-400"></i>
-                                                <div>
+                                                <div class="text-right">
                                                     <div class="font-medium">شهادة خبرة</div>
                                                     <div class="text-xs text-gray-500">إثبات خبرة</div>
+                                                </div>
+                                            </div>
+                                        </button>
+
+                                        <button onclick="generateForm('vacation-annual')" class="form-type-btn w-full p-4 text-right bg-teal-50 hover:bg-teal-100 dark:bg-teal-900/20 dark:hover:bg-teal-900/40 border border-teal-200 dark:border-teal-800 rounded-lg transition-all">
+                                            <div class="flex items-center space-x-3 space-x-reverse">
+                                                <i class="fas fa-calendar-check text-teal-600 dark:text-teal-400"></i>
+                                                <div class="text-right">
+                                                    <div class="font-medium">إجازة سنوية</div>
+                                                    <div class="text-xs text-gray-500">طلب إجازة سنوية</div>
+                                                </div>
+                                            </div>
+                                        </button>
+
+                                        <button onclick="generateForm('vacation-sick')" class="form-type-btn w-full p-4 text-right bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 border border-red-200 dark:border-red-800 rounded-lg transition-all">
+                                            <div class="flex items-center space-x-3 space-x-reverse">
+                                                <i class="fas fa-medical text-red-600 dark:text-red-400"></i>
+                                                <div class="text-right">
+                                                    <div class="font-medium">إجازة مرضية</div>
+                                                    <div class="text-xs text-gray-500">طلب إجازة مرضية</div>
+                                                </div>
+                                            </div>
+                                        </button>
+
+                                        <button onclick="generateForm('vacation-unpaid')" class="form-type-btn w-full p-4 text-right bg-orange-50 hover:bg-orange-100 dark:bg-orange-900/20 dark:hover:bg-orange-900/40 border border-orange-200 dark:border-orange-800 rounded-lg transition-all">
+                                            <div class="flex items-center space-x-3 space-x-reverse">
+                                                <i class="fas fa-pause text-orange-600 dark:text-orange-400"></i>
+                                                <div class="text-right">
+                                                    <div class="font-medium">إجازة بدون راتب</div>
+                                                    <div class="text-xs text-gray-500">طلب إجازة بدون راتب</div>
+                                                </div>
+                                            </div>
+                                        </button>
+
+                                        <button onclick="generateForm('custody-receive')" class="form-type-btn w-full p-4 text-right bg-cyan-50 hover:bg-cyan-100 dark:bg-cyan-900/20 dark:hover:bg-cyan-900/40 border border-cyan-200 dark:border-cyan-800 rounded-lg transition-all">
+                                            <div class="flex items-center space-x-3 space-x-reverse">
+                                                <i class="fas fa-box text-cyan-600 dark:text-cyan-400"></i>
+                                                <div class="text-right">
+                                                    <div class="font-medium">استلام عهدة</div>
+                                                    <div class="text-xs text-gray-500">محضر استلام العهدات</div>
+                                                </div>
+                                            </div>
+                                        </button>
+
+                                        <button onclick="generateForm('custody-handover')" class="form-type-btn w-full p-4 text-right bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 dark:hover:bg-amber-900/40 border border-amber-200 dark:border-amber-800 rounded-lg transition-all">
+                                            <div class="flex items-center space-x-3 space-x-reverse">
+                                                <i class="fas fa-handshake text-amber-600 dark:text-amber-400"></i>
+                                                <div class="text-right">
+                                                    <div class="font-medium">تسليم عهدة</div>
+                                                    <div class="text-xs text-gray-500">محضر تسليم العهدات</div>
+                                                </div>
+                                            </div>
+                                        </button>
+
+                                        <button onclick="generateForm('service-termination')" class="form-type-btn w-full p-4 text-right bg-gray-50 hover:bg-gray-100 dark:bg-gray-900/20 dark:hover:bg-gray-900/40 border border-gray-200 dark:border-gray-800 rounded-lg transition-all">
+                                            <div class="flex items-center space-x-3 space-x-reverse">
+                                                <i class="fas fa-user-times text-gray-600 dark:text-gray-400"></i>
+                                                <div class="text-right">
+                                                    <div class="font-medium">إنهاء الخدمات</div>
+                                                    <div class="text-xs text-gray-500">قرار إنهاء الخدمة</div>
+                                                </div>
+                                            </div>
+                                        </button>
+
+                                        <button onclick="generateForm('resignation')" class="form-type-btn w-full p-4 text-right bg-rose-50 hover:bg-rose-100 dark:bg-rose-900/20 dark:hover:bg-rose-900/40 border border-rose-200 dark:border-rose-800 rounded-lg transition-all">
+                                            <div class="flex items-center space-x-3 space-x-reverse">
+                                                <i class="fas fa-sign-out-alt text-rose-600 dark:text-rose-400"></i>
+                                                <div class="text-right">
+                                                    <div class="font-medium">الاستقالة</div>
+                                                    <div class="text-xs text-gray-500">طلب استقالة</div>
                                                 </div>
                                             </div>
                                         </button>
@@ -538,8 +768,11 @@
                     <!-- Form Preview -->
                     <div class="lg:col-span-3">
                         <div class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-6">
-                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 no-print">
-                                <h3 class="text-xl font-bold text-primary mb-4 sm:mb-0">معاينة النموذج</h3>
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 no-print space-y-4 sm:space-y-0">
+                                <h3 class="text-xl font-bold text-primary flex items-center">
+                                    <i class="fas fa-eye ml-2"></i>
+                                    معاينة النموذج
+                                </h3>
                                 <div class="flex flex-wrap gap-2">
                                     <button onclick="saveForm()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 space-x-reverse">
                                         <i class="fas fa-save"></i>
@@ -549,22 +782,14 @@
                                         <i class="fas fa-file-pdf"></i>
                                         <span>PDF</span>
                                     </button>
-                                    <button onclick="exportToWord()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 space-x-reverse">
-                                        <i class="fas fa-file-word"></i>
-                                        <span>Word</span>
-                                    </button>
                                     <button onclick="printForm()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 space-x-reverse">
                                         <i class="fas fa-print"></i>
                                         <span>طباعة</span>
                                     </button>
-                                    <button onclick="shareForm()" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 space-x-reverse">
-                                        <i class="fas fa-share-alt"></i>
-                                        <span>مشاركة</span>
-                                    </button>
                                 </div>
                             </div>
                             
-                            <div id="form-preview" class="min-h-screen form-template dark:form-template p-8 rounded-lg">
+                            <div id="form-preview" class="min-h-screen form-template p-8 rounded-lg">
                                 <div class="text-center text-gray-500 dark:text-gray-400 py-20">
                                     <i class="fas fa-file-alt text-6xl mb-4 opacity-50"></i>
                                     <h3 class="text-xl font-medium mb-2">اختر موظف ونوع النموذج</h3>
@@ -576,75 +801,46 @@
                 </div>
             </section>
 
-            <!-- Analytics Section -->
-            <section id="analytics-section" class="section-content">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                    <div class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-6">
-                        <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">توزيع الموظفين حسب القسم</h3>
-                        <canvas id="department-chart" width="400" height="300"></canvas>
-                    </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-6">
-                        <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">النماذج المولدة شهرياً</h3>
-                        <canvas id="forms-chart" width="400" height="300"></canvas>
-                    </div>
-                </div>
 
-                <div class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-6">
-                    <h3 class="text-xl font-bold mb-6 text-gray-900 dark:text-white">تقرير مفصل</h3>
-                    <div class="grid md:grid-cols-3 gap-6">
-                        <div class="text-center p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                            <i class="fas fa-chart-line text-3xl text-blue-600 dark:text-blue-400 mb-3"></i>
-                            <h4 class="font-bold text-lg text-blue-800 dark:text-blue-300">معدل النمو</h4>
-                            <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">+15%</p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">مقارنة بالشهر الماضي</p>
-                        </div>
-                        <div class="text-center p-6 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                            <i class="fas fa-users text-3xl text-green-600 dark:text-green-400 mb-3"></i>
-                            <h4 class="font-bold text-lg text-green-800 dark:text-green-300">معدل الاستبقاء</h4>
-                            <p class="text-2xl font-bold text-green-600 dark:text-green-400">94%</p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">استبقاء الموظفين</p>
-                        </div>
-                        <div class="text-center p-6 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                            <i class="fas fa-clock text-3xl text-purple-600 dark:text-purple-400 mb-3"></i>
-                            <h4 class="font-bold text-lg text-purple-800 dark:text-purple-300">متوسط الخدمة</h4>
-                            <p class="text-2xl font-bold text-purple-600 dark:text-purple-400">3.2 سنة</p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">متوسط فترة الخدمة</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
 
             <!-- Settings Section -->
             <section id="settings-section" class="section-content">
-                <div class="grid md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-6">
-                        <h3 class="text-xl font-bold mb-6 text-gray-900 dark:text-white">إعدادات الشركة</h3>
+                        <h3 class="text-xl font-bold mb-6 text-gray-900 dark:text-white flex items-center">
+                            <i class="fas fa-building text-primary ml-2"></i>
+                            إعدادات الشركة
+                        </h3>
                         <form id="company-settings-form" class="space-y-4">
                             <div class="input-group">
                                 <label>اسم الشركة</label>
-                                <input type="text" id="company-name" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white" value="شركة التقنية المتطورة">
+                                <input type="text" id="company-name" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all" value="شركة التقنية المتطورة">
                             </div>
                             <div class="input-group">
                                 <label>عنوان الشركة</label>
-                                <textarea id="company-address" rows="3" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white">الرياض، المملكة العربية السعودية</textarea>
+                                <textarea id="company-address" rows="3" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all">الرياض، المملكة العربية السعودية</textarea>
                             </div>
                             <div class="input-group">
                                 <label>رقم الهاتف</label>
-                                <input type="tel" id="company-phone" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white" value="920000000">
+                                <input type="tel" id="company-phone" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all" value="920000000">
                             </div>
                             <div class="input-group">
                                 <label>البريد الإلكتروني</label>
-                                <input type="email" id="company-email" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white" value="info@company.com">
+                                <input type="email" id="company-email" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all" value="info@company.com">
                             </div>
-                            <button type="submit" class="w-full bg-primary hover:bg-blue-600 text-white py-3 rounded-lg transition-colors">
+                            <button type="submit" class="w-full bg-gradient-to-r from-primary to-secondary hover:from-blue-600 hover:to-purple-600 text-white py-3 rounded-lg transition-all font-medium">
                                 حفظ الإعدادات
                             </button>
                         </form>
                     </div>
 
                     <div class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-6">
-                        <h3 class="text-xl font-bold mb-6 text-gray-900 dark:text-white">إعدادات النظام</h3>
+                        <h3 class="text-xl font-bold mb-6 text-gray-900 dark:text-white flex items-center">
+                            <i class="fas fa-cog text-primary ml-2"></i>
+                            إعدادات النظام
+                        </h3>
                         <div class="space-y-6">
+                            <!-- System settings toggles -->
                             <div class="flex items-center justify-between">
                                 <div>
                                     <h4 class="font-medium text-gray-900 dark:text-white">التزامن التلقائي</h4>
@@ -677,15 +873,6 @@
                                     <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                                 </label>
                             </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">تكرار النسخ الاحتياطي</label>
-                                <select class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white">
-                                    <option value="daily">يومي</option>
-                                    <option value="weekly">أسبوعي</option>
-                                    <option value="monthly">شهري</option>
-                                </select>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -694,56 +881,35 @@
             <!-- Backup Section -->
             <section id="backup-section" class="section-content">
                 <div class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-6">
-                    <h3 class="text-xl font-bold mb-6 text-gray-900 dark:text-white">إدارة النسخ الاحتياطية</h3>
+                    <h3 class="text-xl font-bold mb-6 text-gray-900 dark:text-white flex items-center">
+                        <i class="fas fa-database text-primary ml-2"></i>
+                        إدارة النسخ الاحتياطية
+                    </h3>
                     
-                    <div class="grid md:grid-cols-2 gap-6 mb-8">
-                        <div class="space-y-4">
-                            <h4 class="font-semibold text-gray-900 dark:text-white">إنشاء نسخة احتياطية</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="space-y-4 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
+                            <h4 class="font-semibold text-gray-900 dark:text-white flex items-center">
+                                <i class="fas fa-download text-blue-600 dark:text-blue-400 ml-2"></i>
+                                إنشاء نسخة احتياطية
+                            </h4>
                             <p class="text-sm text-gray-600 dark:text-gray-400">قم بإنشاء نسخة احتياطية من جميع البيانات</p>
-                            <button onclick="createBackup()" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg transition-colors flex items-center justify-center space-x-2 space-x-reverse">
+                            <button onclick="createBackup()" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg transition-colors flex items-center justify-center space-x-2 space-x-reverse font-medium">
                                 <i class="fas fa-download"></i>
                                 <span>إنشاء نسخة احتياطية</span>
                             </button>
                         </div>
                         
-                        <div class="space-y-4">
-                            <h4 class="font-semibold text-gray-900 dark:text-white">استيراد نسخة احتياطية</h4>
+                        <div class="space-y-4 p-6 bg-green-50 dark:bg-green-900/20 rounded-xl">
+                            <h4 class="font-semibold text-gray-900 dark:text-white flex items-center">
+                                <i class="fas fa-upload text-green-600 dark:text-green-400 ml-2"></i>
+                                استيراد نسخة احتياطية
+                            </h4>
                             <p class="text-sm text-gray-600 dark:text-gray-400">استعادة البيانات من نسخة احتياطية</p>
-                            <label class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg transition-colors cursor-pointer flex items-center justify-center space-x-2 space-x-reverse">
+                            <label class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg transition-colors cursor-pointer flex items-center justify-center space-x-2 space-x-reverse font-medium">
                                 <i class="fas fa-upload"></i>
                                 <span>اختيار ملف النسخة الاحتياطية</span>
                                 <input type="file" id="backup-file" accept=".json" class="hidden">
                             </label>
-                        </div>
-                    </div>
-
-                    <div id="backup-history">
-                        <h4 class="font-semibold text-gray-900 dark:text-white mb-4">سجل النسخ الاحتياطية</h4>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm">
-                                <thead class="bg-gray-50 dark:bg-gray-700">
-                                    <tr>
-                                        <th class="px-4 py-3 text-right">التاريخ</th>
-                                        <th class="px-4 py-3 text-right">الحجم</th>
-                                        <th class="px-4 py-3 text-right">النوع</th>
-                                        <th class="px-4 py-3 text-right">الحالة</th>
-                                        <th class="px-4 py-3 text-right">الإجراءات</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                    <tr>
-                                        <td class="px-4 py-3">2024-01-15 10:30:00</td>
-                                        <td class="px-4 py-3">2.5 MB</td>
-                                        <td class="px-4 py-3">تلقائي</td>
-                                        <td class="px-4 py-3">
-                                            <span class="px-2 py-1 text-xs bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300 rounded-full">مكتمل</span>
-                                        </td>
-                                        <td class="px-4 py-3">
-                                            <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm">تحميل</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
                         </div>
                     </div>
                 </div>
@@ -753,32 +919,35 @@
 
     <!-- Add Employee Modal -->
     <div id="add-employee-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-screen overflow-y-auto animate-slide-up">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-4xl w-full max-h-screen overflow-y-auto animate-scale-in">
             <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-xl font-bold text-primary">إضافة موظف جديد</h3>
-                    <button onclick="hideAddEmployeeModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                    <h3 class="text-xl font-bold text-primary flex items-center">
+                        <i class="fas fa-user-plus ml-2"></i>
+                        إضافة موظف جديد
+                    </h3>
+                    <button onclick="hideAddEmployeeModal()" class="p-2 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                         <i class="fas fa-times text-xl"></i>
                     </button>
                 </div>
             </div>
             <div class="p-6">
-                <form id="add-employee-form" class="grid md:grid-cols-2 gap-6">
+                <form id="add-employee-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="input-group">
                         <label>الاسم الكامل *</label>
-                        <input type="text" id="emp-name" required class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white">
+                        <input type="text" id="emp-name" required class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
                     </div>
                     <div class="input-group">
                         <label>الرقم الوظيفي *</label>
-                        <input type="text" id="emp-id" required class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white">
+                        <input type="text" id="emp-id" required class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
                     </div>
                     <div class="input-group">
                         <label>المسمى الوظيفي *</label>
-                        <input type="text" id="emp-position" required class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white">
+                        <input type="text" id="emp-position" required class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
                     </div>
                     <div class="input-group">
                         <label>القسم *</label>
-                        <select id="emp-department" required class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white">
+                        <select id="emp-department" required class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
                             <option value="">اختر القسم</option>
                             <option value="تقنية المعلومات">تقنية المعلومات</option>
                             <option value="الموارد البشرية">الموارد البشرية</option>
@@ -790,27 +959,27 @@
                     </div>
                     <div class="input-group">
                         <label>تاريخ التعيين *</label>
-                        <input type="date" id="emp-hire-date" required class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white">
+                        <input type="date" id="emp-hire-date" required class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
                     </div>
                     <div class="input-group">
                         <label>الراتب الأساسي</label>
-                        <input type="number" id="emp-salary" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white">
+                        <input type="number" id="emp-salary" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
                     </div>
                     <div class="input-group">
                         <label>رقم الهوية الوطنية</label>
-                        <input type="text" id="emp-national-id" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white">
+                        <input type="text" id="emp-national-id" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
                     </div>
                     <div class="input-group">
                         <label>البريد الإلكتروني</label>
-                        <input type="email" id="emp-email" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white">
+                        <input type="email" id="emp-email" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
                     </div>
                     <div class="input-group">
                         <label>رقم الهاتف</label>
-                        <input type="tel" id="emp-phone" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white">
+                        <input type="tel" id="emp-phone" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
                     </div>
                     <div class="input-group">
                         <label>الحالة الاجتماعية</label>
-                        <select id="emp-marital-status" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white">
+                        <select id="emp-marital-status" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
                             <option value="">اختر الحالة</option>
                             <option value="أعزب">أعزب</option>
                             <option value="متزوج">متزوج</option>
@@ -820,20 +989,20 @@
                     </div>
                     <div class="input-group">
                         <label>تاريخ الميلاد</label>
-                        <input type="date" id="emp-birth-date" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white">
+                        <input type="date" id="emp-birth-date" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
                     </div>
                     <div class="input-group md:col-span-2">
                         <label>العنوان</label>
-                        <textarea id="emp-address" rows="3" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white"></textarea>
+                        <textarea id="emp-address" rows="3" class="w-full p-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all"></textarea>
                     </div>
-                    <div class="md:col-span-2 flex space-x-3 space-x-reverse pt-4">
-                        <button type="submit" class="flex-1 bg-primary hover:bg-blue-600 text-white py-3 rounded-lg transition-colors font-medium">
-                            <i class="fas fa-save ml-2"></i>
-                            حفظ الموظف
+                    <div class="md:col-span-2 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 sm:space-x-reverse pt-4">
+                        <button type="submit" class="flex-1 bg-gradient-to-r from-primary to-secondary hover:from-blue-600 hover:to-purple-600 text-white py-3 rounded-lg transition-all font-medium flex items-center justify-center space-x-2 space-x-reverse">
+                            <i class="fas fa-save"></i>
+                            <span>حفظ الموظف</span>
                         </button>
-                        <button type="button" onclick="hideAddEmployeeModal()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 rounded-lg transition-colors font-medium">
-                            <i class="fas fa-times ml-2"></i>
-                            إلغاء
+                        <button type="button" onclick="hideAddEmployeeModal()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 rounded-lg transition-all font-medium flex items-center justify-center space-x-2 space-x-reverse">
+                            <i class="fas fa-times"></i>
+                            <span>إلغاء</span>
                         </button>
                     </div>
                 </form>
@@ -855,25 +1024,6 @@
         let sortColumn = 'name';
         let generatedForms = 0;
         let charts = {};
-
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDy8Q7YnXJQ7Y6Q8Q7Y6Q8Q7Y6Q8Q7Y6Q8",
-            authDomain: "hr-system-demo.firebaseapp.com", 
-            projectId: "hr-system-demo",
-            storageBucket: "hr-system-demo.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:abcdefghijklmnop123456"
-        };
-
-        // Initialize Firebase
-        try {
-            firebase.initializeApp(firebaseConfig);
-            var db = firebase.firestore();
-            var storage = firebase.storage();
-        } catch (error) {
-            console.log('Firebase initialization failed, using offline mode');
-        }
 
         // Theme Management
         function initializeTheme() {
@@ -911,10 +1061,10 @@
             
             if (sidebar.classList.contains('open')) {
                 sidebar.classList.remove('open');
-                overlay.classList.add('hidden');
+                overlay.classList.remove('active');
             } else {
                 sidebar.classList.add('open');
-                overlay.classList.remove('hidden');
+                overlay.classList.add('active');
             }
         }
 
@@ -923,20 +1073,19 @@
             // Hide all sections
             document.querySelectorAll('.section-content').forEach(section => {
                 section.classList.remove('active');
-                section.style.display = 'none';
             });
             
             // Remove active state from nav buttons
             document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('bg-primary', 'text-white');
+                btn.classList.remove('active');
             });
             
             // Show selected section
             const section = document.getElementById(sectionName + '-section');
             if (section) {
-                section.classList.add('active');
-                section.style.display = 'block';
-                section.classList.add('animate-fade-in');
+                setTimeout(() => {
+                    section.classList.add('active');
+                }, 100);
             }
             
             // Update page title
@@ -957,7 +1106,7 @@
             // Highlight active nav button
             const navBtn = document.querySelector(`[onclick="showSection('${sectionName}')"]`);
             if (navBtn) {
-                navBtn.classList.add('bg-primary', 'text-white');
+                navBtn.classList.add('active');
             }
             
             // Close sidebar on mobile
@@ -965,10 +1114,7 @@
                 toggleSidebar();
             }
             
-            // Load section-specific data
-            if (sectionName === 'analytics') {
-                initializeCharts();
-            }
+            // Load section-specific data if needed
         }
 
         // Employee Management
@@ -1017,9 +1163,6 @@
             }
 
             try {
-                if (typeof db !== 'undefined') {
-                    await db.collection('employees').add(employee);
-                }
                 employees.push(employee);
                 updateEmployeesTable();
                 updateEmployeeSelect();
@@ -1090,9 +1233,6 @@
                     };
 
                     if (employee.name && employee.employeeId && !employees.some(emp => emp.employeeId === employee.employeeId)) {
-                        if (typeof db !== 'undefined') {
-                            await db.collection('employees').add(employee);
-                        }
                         employees.push(employee);
                         successCount++;
                     } else {
@@ -1227,7 +1367,7 @@
             pageData.forEach((employee, index) => {
                 const actualIndex = dataToShow.indexOf(employee);
                 const row = document.createElement('tr');
-                row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors';
+                row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700 transition-all';
                 
                 const statusClass = employee.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' :
                                   employee.status === 'on-leave' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300' :
@@ -1237,33 +1377,33 @@
                                  employee.status === 'on-leave' ? 'في إجازة' : 'غير نشط';
 
                 row.innerHTML = `
-                    <td class="px-6 py-4">
+                    <td class="px-4 py-4">
                         <input type="checkbox" class="employee-checkbox rounded border-gray-300" value="${actualIndex}">
                     </td>
-                    <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                    <td class="px-4 py-4 font-medium text-gray-900 dark:text-white">
                         <div class="flex items-center space-x-3 space-x-reverse">
-                            <div class="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">
+                            <div class="w-8 h-8 bg-gradient-to-br from-primary to-secondary text-white rounded-full flex items-center justify-center text-sm font-bold">
                                 ${employee.name.charAt(0)}
                             </div>
                             <span>${employee.name}</span>
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-gray-900 dark:text-gray-300">${employee.employeeId}</td>
-                    <td class="px-6 py-4 text-gray-900 dark:text-gray-300">${employee.position}</td>
-                    <td class="px-6 py-4 text-gray-900 dark:text-gray-300">${employee.department}</td>
-                    <td class="px-6 py-4 text-gray-900 dark:text-gray-300">${formatDate(employee.hireDate)}</td>
-                    <td class="px-6 py-4">
+                    <td class="px-4 py-4 text-gray-900 dark:text-gray-300">${employee.employeeId}</td>
+                    <td class="px-4 py-4 text-gray-900 dark:text-gray-300">${employee.position}</td>
+                    <td class="px-4 py-4 text-gray-900 dark:text-gray-300">${employee.department}</td>
+                    <td class="px-4 py-4 text-gray-900 dark:text-gray-300">${formatDate(employee.hireDate)}</td>
+                    <td class="px-4 py-4">
                         <span class="px-2 py-1 text-xs rounded-full ${statusClass}">${statusText}</span>
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-4 py-4">
                         <div class="flex space-x-2 space-x-reverse">
-                            <button onclick="editEmployee(${actualIndex})" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 p-1" title="تعديل">
+                            <button onclick="editEmployee(${actualIndex})" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all" title="تعديل">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button onclick="deleteEmployee(${actualIndex})" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 p-1" title="حذف">
+                            <button onclick="deleteEmployee(${actualIndex})" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-all" title="حذف">
                                 <i class="fas fa-trash"></i>
                             </button>
-                            <button onclick="viewEmployee(${actualIndex})" class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 p-1" title="عرض">
+                            <button onclick="viewEmployee(${actualIndex})" class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 p-2 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20 transition-all" title="عرض">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
@@ -1303,7 +1443,7 @@
             for (let i = startPage; i <= endPage; i++) {
                 const pageBtn = document.createElement('button');
                 pageBtn.textContent = i;
-                pageBtn.className = `px-3 py-2 text-sm rounded-lg ${i === currentPage ? 'bg-primary text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`;
+                pageBtn.className = `px-3 py-2 text-sm rounded-lg transition-colors ${i === currentPage ? 'bg-primary text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`;
                 pageBtn.onclick = () => goToPage(i);
                 pageNumbers.appendChild(pageBtn);
             }
@@ -1361,7 +1501,6 @@
 
         // Employee actions
         function editEmployee(index) {
-            // Implementation for editing employee
             showNotification('وظيفة التعديل قيد التطوير', 'info');
         }
 
@@ -1381,7 +1520,6 @@
         }
 
         function viewEmployee(index) {
-            // Implementation for viewing employee details
             showNotification('وظيفة العرض قيد التطوير', 'info');
         }
 
@@ -1403,20 +1541,32 @@
                 case 'vacation':
                     preview.innerHTML = generateVacationForm(currentEmployee);
                     break;
-                case 'custody':
-                    preview.innerHTML = generateCustodyForm(currentEmployee);
-                    break;
-                case 'resignation':
-                    preview.innerHTML = generateResignationForm(currentEmployee);
-                    break;
-                case 'termination':
-                    preview.innerHTML = generateTerminationForm(currentEmployee);
-                    break;
                 case 'salary-certificate':
                     preview.innerHTML = generateSalaryCertificateForm(currentEmployee);
                     break;
                 case 'experience-certificate':
                     preview.innerHTML = generateExperienceCertificateForm(currentEmployee);
+                    break;
+                case 'vacation-annual':
+                    preview.innerHTML = generateAnnualVacationForm(currentEmployee);
+                    break;
+                case 'vacation-sick':
+                    preview.innerHTML = generateSickVacationForm(currentEmployee);
+                    break;
+                case 'vacation-unpaid':
+                    preview.innerHTML = generateUnpaidVacationForm(currentEmployee);
+                    break;
+                case 'custody-receive':
+                    preview.innerHTML = generateCustodyReceiveForm(currentEmployee);
+                    break;
+                case 'custody-handover':
+                    preview.innerHTML = generateCustodyHandoverForm(currentEmployee);
+                    break;
+                case 'service-termination':
+                    preview.innerHTML = generateServiceTerminationForm(currentEmployee);
+                    break;
+                case 'resignation':
+                    preview.innerHTML = generateResignationForm(currentEmployee);
                     break;
             }
 
@@ -1429,23 +1579,470 @@
             const names = {
                 'start-work': 'مباشرة عمل',
                 'vacation': 'طلب إجازة',
-                'custody': 'تسليم واستلام عهدة',
-                'resignation': 'استقالة',
-                'termination': 'إنهاء خدمات',
                 'salary-certificate': 'شهادة راتب',
-                'experience-certificate': 'شهادة خبرة'
+                'experience-certificate': 'شهادة خبرة',
+                'vacation-annual': 'إجازة سنوية',
+                'vacation-sick': 'إجازة مرضية',
+                'vacation-unpaid': 'إجازة بدون راتب',
+                'custody-receive': 'استلام عهدة',
+                'custody-handover': 'تسليم عهدة',
+                'service-termination': 'إنهاء الخدمات',
+                'resignation': 'الاستقالة'
             };
             return names[formType] || formType;
         }
 
-        // Form Templates (keeping the original ones and adding new ones)
+        // Additional Form Templates
+        function generateAnnualVacationForm(employee) {
+            const companyName = document.getElementById('company-name')?.value || 'شركة التقنية المتطورة';
+            
+            return `
+                <div class="max-w-4xl mx-auto bg-white p-8 print:p-6">
+                    ${generateFormHeader(companyName)}
+                    
+                    <div class="mb-8 text-center">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">طلب إجازة سنوية</h1>
+                        <p class="text-gray-600">نموذج طلب إجازة سنوية رسمي</p>
+                        <div class="mt-4 text-sm text-gray-500">
+                            رقم الطلب: AV-${employee.employeeId}-${new Date().getFullYear()}
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6 mb-8">
+                        <div class="space-y-4">
+                            ${generateInfoField('اسم الموظف', employee.name)}
+                            ${generateInfoField('الرقم الوظيفي', employee.employeeId)}
+                            ${generateInfoField('المسمى الوظيفي', employee.position)}
+                            ${generateInfoField('القسم', employee.department)}
+                        </div>
+                        <div class="space-y-4">
+                            ${generateInfoField('تاريخ التعيين', formatDate(employee.hireDate))}
+                            ${generateInfoField('تاريخ الطلب', formatDate(new Date()))}
+                            ${generateInfoField('رصيد الإجازة المتبقي', '__________ يوم')}
+                            ${generateInfoField('آخر إجازة سنوية', '__________')}
+                        </div>
+                    </div>
+
+                    <div class="bg-teal-50 p-6 rounded-lg border-r-4 border-teal-500 mb-8">
+                        <h3 class="font-bold text-lg mb-6 text-teal-800">تفاصيل الإجازة السنوية</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                ${generateEditableField('تاريخ بداية الإجازة')}
+                                ${generateEditableField('تاريخ نهاية الإجازة')}
+                                ${generateEditableField('عدد أيام الإجازة المطلوبة')}
+                                ${generateEditableField('تاريخ استئناف العمل')}
+                            </div>
+                            <div class="space-y-4">
+                                ${generateEditableField('سبب الإجازة')}
+                                ${generateEditableField('عنوان الاتصال أثناء الإجازة')}
+                                ${generateEditableField('رقم الهاتف أثناء الإجازة')}
+                                ${generateEditableField('بديل الموظف في العمل')}
+                            </div>
+                        </div>
+                    </div>
+
+                    ${generateFormFooter(true)}
+                </div>
+            `;
+        }
+
+        function generateSickVacationForm(employee) {
+            const companyName = document.getElementById('company-name')?.value || 'شركة التقنية المتطورة';
+            
+            return `
+                <div class="max-w-4xl mx-auto bg-white p-8 print:p-6">
+                    ${generateFormHeader(companyName)}
+                    
+                    <div class="mb-8 text-center">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">طلب إجازة مرضية</h1>
+                        <p class="text-gray-600">نموذج طلب إجازة مرضية رسمي</p>
+                        <div class="mt-4 text-sm text-gray-500">
+                            رقم الطلب: SV-${employee.employeeId}-${new Date().getFullYear()}
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6 mb-8">
+                        <div class="space-y-4">
+                            ${generateInfoField('اسم الموظف', employee.name)}
+                            ${generateInfoField('الرقم الوظيفي', employee.employeeId)}
+                            ${generateInfoField('المسمى الوظيفي', employee.position)}
+                            ${generateInfoField('القسم', employee.department)}
+                        </div>
+                        <div class="space-y-4">
+                            ${generateInfoField('تاريخ التعيين', formatDate(employee.hireDate))}
+                            ${generateInfoField('تاريخ الطلب', formatDate(new Date()))}
+                            ${generateInfoField('رصيد الإجازة المرضية', '__________ يوم')}
+                            ${generateInfoField('آخر إجازة مرضية', '__________')}
+                        </div>
+                    </div>
+
+                    <div class="bg-red-50 p-6 rounded-lg border-r-4 border-red-500 mb-8">
+                        <h3 class="font-bold text-lg mb-6 text-red-800">تفاصيل الإجازة المرضية</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                ${generateEditableField('تاريخ بداية الإجازة')}
+                                ${generateEditableField('تاريخ نهاية الإجازة')}
+                                ${generateEditableField('عدد أيام الإجازة')}
+                                ${generateEditableField('تاريخ الكشف الطبي')}
+                            </div>
+                            <div class="space-y-4">
+                                ${generateEditableField('اسم الطبيب')}
+                                ${generateEditableField('اسم المستشفى/العيادة')}
+                                ${generateEditableField('رقم التقرير الطبي')}
+                                ${generateEditableField('طبيعة المرض')}
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <p class="text-sm text-red-700 font-medium">ملاحظة: يجب إرفاق التقرير الطبي مع هذا الطلب</p>
+                        </div>
+                    </div>
+
+                    ${generateFormFooter(true)}
+                </div>
+            `;
+        }
+
+        function generateUnpaidVacationForm(employee) {
+            const companyName = document.getElementById('company-name')?.value || 'شركة التقنية المتطورة';
+            
+            return `
+                <div class="max-w-4xl mx-auto bg-white p-8 print:p-6">
+                    ${generateFormHeader(companyName)}
+                    
+                    <div class="mb-8 text-center">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">طلب إجازة بدون راتب</h1>
+                        <p class="text-gray-600">نموذج طلب إجازة بدون راتب رسمي</p>
+                        <div class="mt-4 text-sm text-gray-500">
+                            رقم الطلب: UV-${employee.employeeId}-${new Date().getFullYear()}
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6 mb-8">
+                        <div class="space-y-4">
+                            ${generateInfoField('اسم الموظف', employee.name)}
+                            ${generateInfoField('الرقم الوظيفي', employee.employeeId)}
+                            ${generateInfoField('المسمى الوظيفي', employee.position)}
+                            ${generateInfoField('القسم', employee.department)}
+                        </div>
+                        <div class="space-y-4">
+                            ${generateInfoField('تاريخ التعيين', formatDate(employee.hireDate))}
+                            ${generateInfoField('تاريخ الطلب', formatDate(new Date()))}
+                            ${generateInfoField('سنوات الخدمة', calculateExperience(employee.hireDate))}
+                            ${generateInfoField('التقييم الأخير', '__________')}
+                        </div>
+                    </div>
+
+                    <div class="bg-orange-50 p-6 rounded-lg border-r-4 border-orange-500 mb-8">
+                        <h3 class="font-bold text-lg mb-6 text-orange-800">تفاصيل الإجازة بدون راتب</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                ${generateEditableField('تاريخ بداية الإجازة')}
+                                ${generateEditableField('تاريخ نهاية الإجازة')}
+                                ${generateEditableField('المدة المطلوبة')}
+                                ${generateEditableField('تاريخ استئناف العمل')}
+                            </div>
+                            <div class="space-y-4">
+                                ${generateEditableField('سبب طلب الإجازة')}
+                                ${generateEditableField('عنوان الإقامة أثناء الإجازة')}
+                                ${generateEditableField('رقم الهاتف للاتصال')}
+                                ${generateEditableField('البديل المقترح')}
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <p class="text-sm text-orange-700 font-medium">ملاحظة: الإجازة بدون راتب تخضع لموافقة الإدارة العليا</p>
+                        </div>
+                    </div>
+
+                    ${generateFormFooter(true)}
+                </div>
+            `;
+        }
+
+        function generateCustodyReceiveForm(employee) {
+            const companyName = document.getElementById('company-name')?.value || 'شركة التقنية المتطورة';
+            
+            return `
+                <div class="max-w-4xl mx-auto bg-white p-8 print:p-6">
+                    ${generateFormHeader(companyName)}
+                    
+                    <div class="mb-8 text-center">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">محضر استلام عهدة</h1>
+                        <p class="text-gray-600">محضر رسمي لاستلام العهدات والأصول</p>
+                        <div class="mt-4 text-sm text-gray-500">
+                            رقم المحضر: CR-${employee.employeeId}-${new Date().getFullYear()}
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6 mb-8">
+                        <div class="space-y-4">
+                            ${generateInfoField('اسم المستلم', employee.name)}
+                            ${generateInfoField('الرقم الوظيفي', employee.employeeId)}
+                            ${generateInfoField('المسمى الوظيفي', employee.position)}
+                            ${generateInfoField('القسم', employee.department)}
+                        </div>
+                        <div class="space-y-4">
+                            ${generateInfoField('تاريخ الاستلام', formatDate(new Date()))}
+                            ${generateInfoField('اسم المسلم', '__________')}
+                            ${generateInfoField('المسؤول عن العهدة', '__________')}
+                            ${generateInfoField('مكان الاستلام', '__________')}
+                        </div>
+                    </div>
+
+                    <div class="bg-cyan-50 p-6 rounded-lg border-r-4 border-cyan-500 mb-8">
+                        <h3 class="font-bold text-lg mb-6 text-cyan-800">تفاصيل العهدات المستلمة</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full border border-gray-300">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="border border-gray-300 p-3 text-right">م</th>
+                                        <th class="border border-gray-300 p-3 text-right">اسم الصنف</th>
+                                        <th class="border border-gray-300 p-3 text-right">رقم المسلسل</th>
+                                        <th class="border border-gray-300 p-3 text-right">الحالة</th>
+                                        <th class="border border-gray-300 p-3 text-right">القيمة</th>
+                                        <th class="border border-gray-300 p-3 text-right">ملاحظات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${[1,2,3,4,5].map(i => `
+                                    <tr>
+                                        <td class="border border-gray-300 p-3">${i}</td>
+                                        <td class="border border-gray-300 p-3 h-10"></td>
+                                        <td class="border border-gray-300 p-3 h-10"></td>
+                                        <td class="border border-gray-300 p-3 h-10"></td>
+                                        <td class="border border-gray-300 p-3 h-10"></td>
+                                        <td class="border border-gray-300 p-3 h-10"></td>
+                                    </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="bg-yellow-50 p-4 rounded-lg border-r-4 border-yellow-500 mb-8">
+                        <p class="text-sm text-yellow-800 font-medium">
+                            تعهد: أتعهد بالمحافظة على العهدات المذكورة أعلاه وإعادتها عند انتهاء الخدمة أو عند الطلب في حالة جيدة، وأتحمل مسؤولية أي ضرر أو فقدان يحدث لها.
+                        </p>
+                    </div>
+
+                    ${generateFormFooter(false)}
+                </div>
+            `;
+        }
+
+        function generateCustodyHandoverForm(employee) {
+            const companyName = document.getElementById('company-name')?.value || 'شركة التقنية المتطورة';
+            
+            return `
+                <div class="max-w-4xl mx-auto bg-white p-8 print:p-6">
+                    ${generateFormHeader(companyName)}
+                    
+                    <div class="mb-8 text-center">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">محضر تسليم عهدة</h1>
+                        <p class="text-gray-600">محضر رسمي لتسليم العهدات والأصول</p>
+                        <div class="mt-4 text-sm text-gray-500">
+                            رقم المحضر: CH-${employee.employeeId}-${new Date().getFullYear()}
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6 mb-8">
+                        <div class="space-y-4">
+                            ${generateInfoField('اسم المسلم', employee.name)}
+                            ${generateInfoField('الرقم الوظيفي', employee.employeeId)}
+                            ${generateInfoField('المسمى الوظيفي', employee.position)}
+                            ${generateInfoField('القسم', employee.department)}
+                        </div>
+                        <div class="space-y-4">
+                            ${generateInfoField('تاريخ التسليم', formatDate(new Date()))}
+                            ${generateInfoField('اسم المستلم', '__________')}
+                            ${generateInfoField('المسؤول عن الاستلام', '__________')}
+                            ${generateInfoField('مكان التسليم', '__________')}
+                        </div>
+                    </div>
+
+                    <div class="bg-amber-50 p-6 rounded-lg border-r-4 border-amber-500 mb-8">
+                        <h3 class="font-bold text-lg mb-6 text-amber-800">تفاصيل العهدات المسلمة</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full border border-gray-300">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="border border-gray-300 p-3 text-right">م</th>
+                                        <th class="border border-gray-300 p-3 text-right">اسم الصنف</th>
+                                        <th class="border border-gray-300 p-3 text-right">رقم المسلسل</th>
+                                        <th class="border border-gray-300 p-3 text-right">حالة التسليم</th>
+                                        <th class="border border-gray-300 p-3 text-right">القيمة</th>
+                                        <th class="border border-gray-300 p-3 text-right">ملاحظات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${[1,2,3,4,5].map(i => `
+                                    <tr>
+                                        <td class="border border-gray-300 p-3">${i}</td>
+                                        <td class="border border-gray-300 p-3 h-10"></td>
+                                        <td class="border border-gray-300 p-3 h-10"></td>
+                                        <td class="border border-gray-300 p-3 h-10"></td>
+                                        <td class="border border-gray-300 p-3 h-10"></td>
+                                        <td class="border border-gray-300 p-3 h-10"></td>
+                                    </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="bg-green-50 p-4 rounded-lg border-r-4 border-green-500 mb-8">
+                        <p class="text-sm text-green-800 font-medium">
+                            إقرار: أقر بأنني قمت بتسليم جميع العهدات المذكورة أعلاه في حالة جيدة وأنني لست مسؤولاً عنها بعد تاريخ التسليم المذكور.
+                        </p>
+                    </div>
+
+                    ${generateFormFooter(false)}
+                </div>
+            `;
+        }
+
+        function generateServiceTerminationForm(employee) {
+            const companyName = document.getElementById('company-name')?.value || 'شركة التقنية المتطورة';
+            
+            return `
+                <div class="max-w-4xl mx-auto bg-white p-8 print:p-6">
+                    ${generateFormHeader(companyName)}
+                    
+                    <div class="mb-8 text-center">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">قرار إنهاء الخدمات</h1>
+                        <p class="text-gray-600">قرار رسمي بإنهاء خدمات الموظف</p>
+                        <div class="mt-4 text-sm text-gray-500">
+                            رقم القرار: ST-${employee.employeeId}-${new Date().getFullYear()}
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6 mb-8">
+                        <div class="space-y-4">
+                            ${generateInfoField('اسم الموظف', employee.name)}
+                            ${generateInfoField('الرقم الوظيفي', employee.employeeId)}
+                            ${generateInfoField('المسمى الوظيفي', employee.position)}
+                            ${generateInfoField('القسم', employee.department)}
+                        </div>
+                        <div class="space-y-4">
+                            ${generateInfoField('تاريخ التعيين', formatDate(employee.hireDate))}
+                            ${generateInfoField('تاريخ إنهاء الخدمة', formatDate(new Date()))}
+                            ${generateInfoField('مدة الخدمة', calculateExperience(employee.hireDate))}
+                            ${generateInfoField('تاريخ آخر يوم عمل', '__________')}
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 p-6 rounded-lg border-r-4 border-gray-500 mb-8">
+                        <h3 class="font-bold text-lg mb-6 text-gray-800">تفاصيل إنهاء الخدمة</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">سبب إنهاء الخدمة</label>
+                                    <div class="space-y-2">
+                                        ${generateCheckbox('انتهاء العقد')}
+                                        ${generateCheckbox('استقالة')}
+                                        ${generateCheckbox('فصل تأديبي')}
+                                        ${generateCheckbox('تقاعد')}
+                                        ${generateCheckbox('عدم تجديد العقد')}
+                                        ${generateEditableField('أسباب أخرى')}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                ${generateEditableField('مدة الإشعار')}
+                                ${generateEditableField('المستحقات المالية')}
+                                ${generateEditableField('بدل إجازات غير مستحقة')}
+                                ${generateEditableField('مكافأة نهاية الخدمة')}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-red-50 p-4 rounded-lg border-r-4 border-red-500 mb-8">
+                        <p class="text-sm text-red-800 font-medium">
+                            ملاحظة: يجب على الموظف تسليم جميع العهدات والأصول والمستندات الخاصة بالشركة قبل تاريخ انتهاء الخدمة.
+                        </p>
+                    </div>
+
+                    ${generateFormFooter(false)}
+                </div>
+            `;
+        }
+
+        function generateResignationForm(employee) {
+            const companyName = document.getElementById('company-name')?.value || 'شركة التقنية المتطورة';
+            
+            return `
+                <div class="max-w-4xl mx-auto bg-white p-8 print:p-6">
+                    ${generateFormHeader(companyName)}
+                    
+                    <div class="mb-8 text-center">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">طلب استقالة</h1>
+                        <p class="text-gray-600">طلب رسمي للاستقالة من العمل</p>
+                        <div class="mt-4 text-sm text-gray-500">
+                            رقم الطلب: RS-${employee.employeeId}-${new Date().getFullYear()}
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6 mb-8">
+                        <div class="space-y-4">
+                            ${generateInfoField('اسم الموظف', employee.name)}
+                            ${generateInfoField('الرقم الوظيفي', employee.employeeId)}
+                            ${generateInfoField('المسمى الوظيفي', employee.position)}
+                            ${generateInfoField('القسم', employee.department)}
+                        </div>
+                        <div class="space-y-4">
+                            ${generateInfoField('تاريخ التعيين', formatDate(employee.hireDate))}
+                            ${generateInfoField('تاريخ تقديم الاستقالة', formatDate(new Date()))}
+                            ${generateInfoField('مدة الخدمة', calculateExperience(employee.hireDate))}
+                            ${generateInfoField('رقم الهوية', employee.nationalId || 'غير محدد')}
+                        </div>
+                    </div>
+
+                    <div class="bg-rose-50 p-6 rounded-lg border-r-4 border-rose-500 mb-8">
+                        <h3 class="font-bold text-lg mb-6 text-rose-800">تفاصيل الاستقالة</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                ${generateEditableField('تاريخ الاستقالة المطلوب')}
+                                ${generateEditableField('آخر يوم عمل')}
+                                ${generateEditableField('مدة الإشعار')}
+                                ${generateEditableField('سبب الاستقالة')}
+                            </div>
+                            <div class="space-y-4">
+                                ${generateEditableField('الوظيفة الجديدة (إن وجدت)')}
+                                ${generateEditableField('جهة العمل الجديدة')}
+                                ${generateEditableField('عنوان الاتصال بعد الاستقالة')}
+                                ${generateEditableField('رقم الهاتف للمتابعة')}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 p-6 rounded-lg border-r-4 border-blue-500 mb-8">
+                        <h3 class="font-bold text-lg mb-4 text-blue-800">التزامات ما بعد الاستقالة</h3>
+                        <div class="space-y-3">
+                            ${generateCheckbox('تسليم جميع العهدات والأصول')}
+                            ${generateCheckbox('تسليم جميع المستندات والملفات')}
+                            ${generateCheckbox('إلغاء الصلاحيات والوصول للأنظمة')}
+                            ${generateCheckbox('تسوية المستحقات المالية')}
+                            ${generateCheckbox('إعادة بطاقة الموظف ومفاتيح المكاتب')}
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">ملاحظات إضافية</label>
+                        <div class="h-20 border-2 border-gray-300 rounded p-3 bg-white"></div>
+                    </div>
+
+                    ${generateFormFooter(true)}
+                </div>
+            `;
+        }
+
+        // Form Templates
         function generateStartWorkForm(employee) {
             const companyName = document.getElementById('company-name')?.value || 'شركة التقنية المتطورة';
             const companyAddress = document.getElementById('company-address')?.value || 'الرياض، المملكة العربية السعودية';
             
             return `
                 <div class="max-w-4xl mx-auto bg-white p-8 print:p-6">
-                    ${generateFormHeader(companyName, companyAddress, 'نموذج مباشرة عمل')}
+                    ${generateFormHeader(companyName, companyAddress)}
                     
                     <div class="mb-8 text-center">
                         <h1 class="text-3xl font-bold text-gray-800 mb-2">إشعار مباشرة عمل</h1>
@@ -1457,40 +2054,16 @@
 
                     <div class="grid md:grid-cols-2 gap-6 mb-8">
                         <div class="space-y-4">
-                            <div class="flex border-b pb-2">
-                                <span class="font-semibold text-gray-700 w-32">الاسم الكامل:</span>
-                                <span class="text-gray-900">${employee.name}</span>
-                            </div>
-                            <div class="flex border-b pb-2">
-                                <span class="font-semibold text-gray-700 w-32">الرقم الوظيفي:</span>
-                                <span class="text-gray-900">${employee.employeeId}</span>
-                            </div>
-                            <div class="flex border-b pb-2">
-                                <span class="font-semibold text-gray-700 w-32">المسمى الوظيفي:</span>
-                                <span class="text-gray-900">${employee.position}</span>
-                            </div>
-                            <div class="flex border-b pb-2">
-                                <span class="font-semibold text-gray-700 w-32">القسم:</span>
-                                <span class="text-gray-900">${employee.department}</span>
-                            </div>
+                            ${generateInfoField('الاسم الكامل', employee.name)}
+                            ${generateInfoField('الرقم الوظيفي', employee.employeeId)}
+                            ${generateInfoField('المسمى الوظيفي', employee.position)}
+                            ${generateInfoField('القسم', employee.department)}
                         </div>
                         <div class="space-y-4">
-                            <div class="flex border-b pb-2">
-                                <span class="font-semibold text-gray-700 w-32">تاريخ المباشرة:</span>
-                                <span class="text-gray-900">${formatDate(employee.hireDate)}</span>
-                            </div>
-                            <div class="flex border-b pb-2">
-                                <span class="font-semibold text-gray-700 w-32">تاريخ الإصدار:</span>
-                                <span class="text-gray-900">${formatDate(new Date())}</span>
-                            </div>
-                            <div class="flex border-b pb-2">
-                                <span class="font-semibold text-gray-700 w-32">رقم الهوية:</span>
-                                <span class="text-gray-900">${employee.nationalId || 'غير محدد'}</span>
-                            </div>
-                            <div class="flex border-b pb-2">
-                                <span class="font-semibold text-gray-700 w-32">الراتب الأساسي:</span>
-                                <span class="text-gray-900">${employee.salary ? employee.salary + ' ريال' : 'غير محدد'}</span>
-                            </div>
+                            ${generateInfoField('تاريخ المباشرة', formatDate(employee.hireDate))}
+                            ${generateInfoField('تاريخ الإصدار', formatDate(new Date()))}
+                            ${generateInfoField('رقم الهوية', employee.nationalId || 'غير محدد')}
+                            ${generateInfoField('الراتب الأساسي', employee.salary ? employee.salary + ' ريال' : 'غير محدد')}
                         </div>
                     </div>
 
@@ -1503,212 +2076,17 @@
                         </p>
                     </div>
 
-                    <div class="bg-gray-50 p-6 rounded-lg mb-8">
-                        <h3 class="font-bold text-lg mb-4 text-gray-800">الشروط والأحكام:</h3>
-                        <ul class="space-y-2 text-gray-700">
-                            <li class="flex items-start">
-                                <span class="text-blue-500 ml-2">•</span>
-                                يلتزم الموظف بالحضور في المواعيد المحددة وفقاً لنظام العمل المعتمد
-                            </li>
-                            <li class="flex items-start">
-                                <span class="text-blue-500 ml-2">•</span>
-                                الالتزام بسياسات وإجراءات الشركة المعمول بها
-                            </li>
-                            <li class="flex items-start">
-                                <span class="text-blue-500 ml-2">•</span>
-                                المحافظة على سرية المعلومات والبيانات الخاصة بالشركة
-                            </li>
-                            <li class="flex items-start">
-                                <span class="text-blue-500 ml-2">•</span>
-                                الالتزام بقواعد السلامة والصحة المهنية
-                            </li>
-                        </ul>
-                    </div>
-
                     ${generateFormFooter()}
                 </div>
             `;
         }
 
-        function generateSalaryCertificateForm(employee) {
-            const companyName = document.getElementById('company-name')?.value || 'شركة التقنية المتطورة';
-            const companyAddress = document.getElementById('company-address')?.value || 'الرياض، المملكة العربية السعودية';
-            
-            return `
-                <div class="max-w-4xl mx-auto bg-white p-8 print:p-6">
-                    ${generateFormHeader(companyName, companyAddress, 'شهادة راتب')}
-                    
-                    <div class="mb-8 text-center">
-                        <h1 class="text-3xl font-bold text-gray-800 mb-2">شهادة راتب</h1>
-                        <p class="text-gray-600">إثبات راتب رسمي</p>
-                        <div class="mt-4 text-sm text-gray-500">
-                            رقم المستند: SC-${employee.employeeId}-${new Date().getFullYear()}
-                        </div>
-                    </div>
-
-                    <div class="bg-green-50 p-6 rounded-lg border-r-4 border-green-500 mb-8">
-                        <p class="text-lg leading-relaxed text-gray-800">
-                            نشهد بأن الموظف/ة <strong class="text-green-800">${employee.name}</strong> 
-                            حامل/ة الرقم الوظيفي <strong class="text-green-800">${employee.employeeId}</strong>
-                            يعمل/تعمل لدينا في منصب <strong class="text-green-800">${employee.position}</strong>
-                            بقسم <strong class="text-green-800">${employee.department}</strong> منذ تاريخ 
-                            <strong class="text-green-800">${formatDate(employee.hireDate)}</strong>.
-                        </p>
-                    </div>
-
-                    <div class="grid md:grid-cols-2 gap-6 mb-8">
-                        <div class="bg-white border border-gray-200 rounded-lg p-6">
-                            <h3 class="font-bold text-lg mb-4 text-gray-800">بيانات الموظف</h3>
-                            <div class="space-y-3">
-                                <div class="flex justify-between border-b pb-2">
-                                    <span class="font-semibold text-gray-600">الاسم:</span>
-                                    <span class="text-gray-900">${employee.name}</span>
-                                </div>
-                                <div class="flex justify-between border-b pb-2">
-                                    <span class="font-semibold text-gray-600">الرقم الوظيفي:</span>
-                                    <span class="text-gray-900">${employee.employeeId}</span>
-                                </div>
-                                <div class="flex justify-between border-b pb-2">
-                                    <span class="font-semibold text-gray-600">المسمى الوظيفي:</span>
-                                    <span class="text-gray-900">${employee.position}</span>
-                                </div>
-                                <div class="flex justify-between border-b pb-2">
-                                    <span class="font-semibold text-gray-600">القسم:</span>
-                                    <span class="text-gray-900">${employee.department}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white border border-gray-200 rounded-lg p-6">
-                            <h3 class="font-bold text-lg mb-4 text-gray-800">تفاصيل الراتب</h3>
-                            <div class="space-y-3">
-                                <div class="flex justify-between border-b pb-2">
-                                    <span class="font-semibold text-gray-600">الراتب الأساسي:</span>
-                                    <span class="text-gray-900">${employee.salary || 'غير محدد'} ريال</span>
-                                </div>
-                                <div class="flex justify-between border-b pb-2">
-                                    <span class="font-semibold text-gray-600">بدل السكن:</span>
-                                    <span class="text-gray-900">__________ ريال</span>
-                                </div>
-                                <div class="flex justify-between border-b pb-2">
-                                    <span class="font-semibold text-gray-600">بدل المواصلات:</span>
-                                    <span class="text-gray-900">__________ ريال</span>
-                                </div>
-                                <div class="flex justify-between border-b pb-2 font-bold">
-                                    <span class="text-gray-800">إجمالي الراتب:</span>
-                                    <span class="text-gray-900">__________ ريال</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-yellow-50 p-6 rounded-lg border-r-4 border-yellow-500 mb-8">
-                        <p class="text-gray-800">
-                            <strong>ملاحظة:</strong> هذه الشهادة صادرة بناءً على طلب الموظف/ة وهي صالحة لمدة ثلاثة أشهر من تاريخ الإصدار.
-                        </p>
-                    </div>
-
-                    ${generateFormFooter()}
-                </div>
-            `;
-        }
-
-        function generateExperienceCertificateForm(employee) {
-            const companyName = document.getElementById('company-name')?.value || 'شركة التقنية المتطورة';
-            const companyAddress = document.getElementById('company-address')?.value || 'الرياض، المملكة العربية السعودية';
-            const experienceYears = calculateExperience(employee.hireDate);
-            
-            return `
-                <div class="max-w-4xl mx-auto bg-white p-8 print:p-6">
-                    ${generateFormHeader(companyName, companyAddress, 'شهادة خبرة')}
-                    
-                    <div class="mb-8 text-center">
-                        <h1 class="text-3xl font-bold text-gray-800 mb-2">شهادة خبرة</h1>
-                        <p class="text-gray-600">إثبات خبرة مهنية</p>
-                        <div class="mt-4 text-sm text-gray-500">
-                            رقم المستند: EC-${employee.employeeId}-${new Date().getFullYear()}
-                        </div>
-                    </div>
-
-                    <div class="bg-purple-50 p-6 rounded-lg border-r-4 border-purple-500 mb-8">
-                        <p class="text-lg leading-relaxed text-gray-800">
-                            نشهد بأن <strong class="text-purple-800">${employee.name}</strong> 
-                            حامل/ة الرقم الوظيفي <strong class="text-purple-800">${employee.employeeId}</strong>
-                            قد عمل/ت لدى <strong class="text-purple-800">${companyName}</strong>
-                            في منصب <strong class="text-purple-800">${employee.position}</strong>
-                            بقسم <strong class="text-purple-800">${employee.department}</strong>
-                            لمدة <strong class="text-purple-800">${experienceYears}</strong>
-                            من تاريخ <strong class="text-purple-800">${formatDate(employee.hireDate)}</strong>
-                            وحتى تاريخ <strong class="text-purple-800">${formatDate(new Date())}</strong>.
-                        </p>
-                    </div>
-
-                    <div class="grid md:grid-cols-2 gap-6 mb-8">
-                        <div class="bg-white border border-gray-200 rounded-lg p-6">
-                            <h3 class="font-bold text-lg mb-4 text-gray-800">المهام والمسؤوليات</h3>
-                            <ul class="space-y-2 text-gray-700">
-                                <li class="flex items-start">
-                                    <span class="text-purple-500 ml-2">•</span>
-                                    تنفيذ المهام المطلوبة في مجال التخصص
-                                </li>
-                                <li class="flex items-start">
-                                    <span class="text-purple-500 ml-2">•</span>
-                                    العمل ضمن فريق متعدد التخصصات
-                                </li>
-                                <li class="flex items-start">
-                                    <span class="text-purple-500 ml-2">•</span>
-                                    إعداد التقارير والدراسات المطلوبة
-                                </li>
-                                <li class="flex items-start">
-                                    <span class="text-purple-500 ml-2">•</span>
-                                    المشاركة في تطوير الإجراءات والعمليات
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div class="bg-white border border-gray-200 rounded-lg p-6">
-                            <h3 class="font-bold text-lg mb-4 text-gray-800">تقييم الأداء</h3>
-                            <div class="space-y-3">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">الالتزام بالمواعيد:</span>
-                                    <span class="text-gray-900">ممتاز</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">جودة العمل:</span>
-                                    <span class="text-gray-900">ممتاز</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">العمل الجماعي:</span>
-                                    <span class="text-gray-900">جيد جداً</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">المبادرة والإبداع:</span>
-                                    <span class="text-gray-900">جيد جداً</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-blue-50 p-6 rounded-lg border-r-4 border-blue-500 mb-8">
-                        <p class="text-gray-800">
-                            <strong>التوصية:</strong> نوصي بـ ${employee.name} بشدة نظراً لالتزامه/ها وكفاءته/ها في أداء المهام المطلوبة،
-                            ونتمنى له/لها التوفيق في مسيرته/ها المهنية المستقبلية.
-                        </p>
-                    </div>
-
-                    ${generateFormFooter()}
-                </div>
-            `;
-        }
-
-        // Keep original form templates (vacation, custody, resignation, termination) with improvements
         function generateVacationForm(employee) {
             const companyName = document.getElementById('company-name')?.value || 'شركة التقنية المتطورة';
-            const companyAddress = document.getElementById('company-address')?.value || 'الرياض، المملكة العربية السعودية';
             
             return `
                 <div class="max-w-4xl mx-auto bg-white p-8 print:p-6">
-                    ${generateFormHeader(companyName, companyAddress, 'طلب إجازة')}
+                    ${generateFormHeader(companyName)}
                     
                     <div class="mb-8 text-center">
                         <h1 class="text-3xl font-bold text-gray-800 mb-2">طلب إجازة</h1>
@@ -1757,36 +2135,99 @@
                         </div>
                     </div>
 
-                    <div class="bg-gray-50 p-6 rounded-lg mb-8">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">سبب الإجازة</label>
-                        <div class="h-32 border-2 border-gray-300 rounded p-3 bg-white"></div>
-                    </div>
-
-                    <div class="bg-blue-50 p-6 rounded-lg mb-8">
-                        <h3 class="font-bold text-lg mb-4 text-gray-800">معلومات مهمة</h3>
-                        <ul class="space-y-2 text-gray-700">
-                            <li class="flex items-start">
-                                <span class="text-blue-500 ml-2">•</span>
-                                يجب تقديم الطلب قبل الإجازة بمدة لا تقل عن أسبوعين
-                            </li>
-                            <li class="flex items-start">
-                                <span class="text-blue-500 ml-2">•</span>
-                                في حالة الإجازة المرضية يجب إرفاق تقرير طبي
-                            </li>
-                            <li class="flex items-start">
-                                <span class="text-blue-500 ml-2">•</span>
-                                سيتم خصم الإجازة من الرصيد السنوي المتاح
-                            </li>
-                        </ul>
-                    </div>
-
                     ${generateFormFooter(true)}
                 </div>
             `;
         }
 
+        function generateSalaryCertificateForm(employee) {
+            const companyName = document.getElementById('company-name')?.value || 'شركة التقنية المتطورة';
+            
+            return `
+                <div class="max-w-4xl mx-auto bg-white p-8 print:p-6">
+                    ${generateFormHeader(companyName)}
+                    
+                    <div class="mb-8 text-center">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">شهادة راتب</h1>
+                        <p class="text-gray-600">إثبات راتب رسمي</p>
+                        <div class="mt-4 text-sm text-gray-500">
+                            رقم المستند: SC-${employee.employeeId}-${new Date().getFullYear()}
+                        </div>
+                    </div>
+
+                    <div class="bg-green-50 p-6 rounded-lg border-r-4 border-green-500 mb-8">
+                        <p class="text-lg leading-relaxed text-gray-800">
+                            نشهد بأن الموظف/ة <strong class="text-green-800">${employee.name}</strong> 
+                            حامل/ة الرقم الوظيفي <strong class="text-green-800">${employee.employeeId}</strong>
+                            يعمل/تعمل لدينا في منصب <strong class="text-green-800">${employee.position}</strong>
+                            بقسم <strong class="text-green-800">${employee.department}</strong> منذ تاريخ 
+                            <strong class="text-green-800">${formatDate(employee.hireDate)}</strong>.
+                        </p>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-white border border-gray-200 rounded-lg p-6">
+                            <h3 class="font-bold text-lg mb-4 text-gray-800">بيانات الموظف</h3>
+                            <div class="space-y-3">
+                                ${generateInfoField('الاسم', employee.name)}
+                                ${generateInfoField('الرقم الوظيفي', employee.employeeId)}
+                                ${generateInfoField('المسمى الوظيفي', employee.position)}
+                                ${generateInfoField('القسم', employee.department)}
+                            </div>
+                        </div>
+
+                        <div class="bg-white border border-gray-200 rounded-lg p-6">
+                            <h3 class="font-bold text-lg mb-4 text-gray-800">تفاصيل الراتب</h3>
+                            <div class="space-y-3">
+                                ${generateInfoField('الراتب الأساسي', (employee.salary || 'غير محدد') + ' ريال')}
+                                ${generateInfoField('بدل السكن', '__________ ريال')}
+                                ${generateInfoField('بدل المواصلات', '__________ ريال')}
+                                ${generateInfoField('إجمالي الراتب', '__________ ريال')}
+                            </div>
+                        </div>
+                    </div>
+
+                    ${generateFormFooter()}
+                </div>
+            `;
+        }
+
+        function generateExperienceCertificateForm(employee) {
+            const companyName = document.getElementById('company-name')?.value || 'شركة التقنية المتطورة';
+            const experienceYears = calculateExperience(employee.hireDate);
+            
+            return `
+                <div class="max-w-4xl mx-auto bg-white p-8 print:p-6">
+                    ${generateFormHeader(companyName)}
+                    
+                    <div class="mb-8 text-center">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">شهادة خبرة</h1>
+                        <p class="text-gray-600">إثبات خبرة مهنية</p>
+                        <div class="mt-4 text-sm text-gray-500">
+                            رقم المستند: EC-${employee.employeeId}-${new Date().getFullYear()}
+                        </div>
+                    </div>
+
+                    <div class="bg-purple-50 p-6 rounded-lg border-r-4 border-purple-500 mb-8">
+                        <p class="text-lg leading-relaxed text-gray-800">
+                            نشهد بأن <strong class="text-purple-800">${employee.name}</strong> 
+                            حامل/ة الرقم الوظيفي <strong class="text-purple-800">${employee.employeeId}</strong>
+                            قد عمل/ت لدى <strong class="text-purple-800">${companyName}</strong>
+                            في منصب <strong class="text-purple-800">${employee.position}</strong>
+                            بقسم <strong class="text-purple-800">${employee.department}</strong>
+                            لمدة <strong class="text-purple-800">${experienceYears}</strong>
+                            من تاريخ <strong class="text-purple-800">${formatDate(employee.hireDate)}</strong>
+                            وحتى تاريخ <strong class="text-purple-800">${formatDate(new Date())}</strong>.
+                        </p>
+                    </div>
+
+                    ${generateFormFooter()}
+                </div>
+            `;
+        }
+
         // Helper functions for form generation
-        function generateFormHeader(companyName, companyAddress, formType) {
+        function generateFormHeader(companyName, companyAddress) {
             return `
                 <div class="text-center mb-8 border-b-2 border-gray-200 pb-6">
                     <div class="flex items-center justify-center mb-4">
@@ -1795,7 +2236,7 @@
                         </div>
                         <div class="text-right">
                             <h2 class="text-2xl font-bold text-gray-800">${companyName}</h2>
-                            <p class="text-gray-600">${companyAddress}</p>
+                            <p class="text-gray-600">${companyAddress || ''}</p>
                         </div>
                     </div>
                 </div>
@@ -1804,8 +2245,8 @@
 
         function generateInfoField(label, value) {
             return `
-                <div class="flex border-b pb-2">
-                    <span class="font-semibold text-gray-700 w-32">${label}:</span>
+                <div class="flex justify-between border-b pb-2">
+                    <span class="font-semibold text-gray-600">${label}:</span>
                     <span class="text-gray-900">${value}</span>
                 </div>
             `;
@@ -1830,7 +2271,7 @@
         }
 
         function generateFormFooter(showApprovals = false) {
-            const baseFooter = `
+            return `
                 <div class="mt-12 pt-8 border-t-2 border-gray-200">
                     <div class="grid ${showApprovals ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-8">
                         <div class="text-center">
@@ -1858,306 +2299,9 @@
                     </div>
                 </div>
             `;
-            return baseFooter;
         }
 
-        // Keep the original form templates for custody, resignation, and termination
-        // (keeping the original implementations as they were already good)
-        function generateCustodyForm(employee) {
-            // Keep original implementation
-            return `
-                <div class="text-center mb-8">
-                    <h1 class="text-2xl font-bold mb-2">نموذج تسليم واستلام العهدة</h1>
-                    <p class="text-gray-600 dark:text-gray-400">محضر تسليم وتسلم الأصول والمسؤوليات</p>
-                </div>
-
-                <div class="space-y-6">
-                    <div class="grid md:grid-cols-2 gap-4">
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded">
-                            <strong>اسم المسلم:</strong> ${employee.name}
-                        </div>
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded">
-                            <strong>الرقم الوظيفي:</strong> ${employee.employeeId}
-                        </div>
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded">
-                            <strong>القسم:</strong> ${employee.department}
-                        </div>
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded">
-                            <strong>تاريخ التسليم:</strong> ${formatDate(new Date())}
-                        </div>
-                    </div>
-
-                    <div class="overflow-x-auto">
-                        <table class="w-full border-collapse border border-gray-400">
-                            <thead>
-                                <tr class="bg-gray-100 dark:bg-gray-700">
-                                    <th class="border border-gray-400 p-3 text-right">م</th>
-                                    <th class="border border-gray-400 p-3 text-right">وصف العهدة</th>
-                                    <th class="border border-gray-400 p-3 text-right">الرقم التسلسلي</th>
-                                    <th class="border border-gray-400 p-3 text-right">الحالة</th>
-                                    <th class="border border-gray-400 p-3 text-right">ملاحظات</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${[1,2,3,4,5,6,7,8,9,10].map(i => `
-                                    <tr>
-                                        <td class="border border-gray-400 p-3">${i}</td>
-                                        <td class="border border-gray-400 p-3 h-12"></td>
-                                        <td class="border border-gray-400 p-3 h-12"></td>
-                                        <td class="border border-gray-400 p-3 h-12"></td>
-                                        <td class="border border-gray-400 p-3 h-12"></td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="grid md:grid-cols-2 gap-8 mt-8 pt-8 border-t">
-                        <div class="text-center">
-                            <h3 class="font-bold mb-4">المسلم</h3>
-                            <div class="space-y-3">
-                                <div>الاسم: ${employee.name}</div>
-                                <div>التوقيع: ________________</div>
-                                <div>التاريخ: ________________</div>
-                            </div>
-                        </div>
-                        <div class="text-center">
-                            <h3 class="font-bold mb-4">المستلم</h3>
-                            <div class="space-y-3">
-                                <div>الاسم: ________________</div>
-                                <div>التوقيع: ________________</div>
-                                <div>التاريخ: ________________</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="text-center mt-8 pt-8 border-t">
-                        <h3 class="font-bold mb-4">اعتماد المدير</h3>
-                        <div class="space-y-3">
-                            <div>الاسم: ________________</div>
-                            <div>التوقيع: ________________</div>
-                            <div>التاريخ: ________________</div>
-                            <div class="w-24 h-24 border-2 border-gray-400 rounded-full mx-auto mt-4"></div>
-                            <div class="text-sm">الختم الرسمي</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function generateResignationForm(employee) {
-            // Keep original implementation with minor improvements
-            return `
-                <div class="text-center mb-8">
-                    <h1 class="text-2xl font-bold mb-2">طلب استقالة</h1>
-                    <p class="text-gray-600 dark:text-gray-400">نموذج رسمي لطلب الاستقالة</p>
-                </div>
-
-                <div class="space-y-6">
-                    <div class="grid md:grid-cols-2 gap-4">
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded">
-                            <strong>اسم الموظف:</strong> ${employee.name}
-                        </div>
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded">
-                            <strong>الرقم الوظيفي:</strong> ${employee.employeeId}
-                        </div>
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded">
-                            <strong>المسمى الوظيفي:</strong> ${employee.position}
-                        </div>
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded">
-                            <strong>القسم:</strong> ${employee.department}
-                        </div>
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded">
-                            <strong>تاريخ التعيين:</strong> ${formatDate(employee.hireDate)}
-                        </div>
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded">
-                            <strong>تاريخ تقديم الطلب:</strong> ${formatDate(new Date())}
-                        </div>
-                    </div>
-
-                    <div class="p-6 border-2 border-gray-300 rounded-lg">
-                        <p class="text-lg leading-relaxed">
-                            إلى من يهمه الأمر،<br><br>
-                            أتقدم إليكم بطلب الاستقالة من منصبي كـ <strong>${employee.position}</strong> في <strong>${employee.department}</strong>، 
-                            وأرغب في أن تكون الاستقالة نافذة المفعول اعتباراً من تاريخ: _______________
-                        </p>
-                    </div>
-
-                    <div class="space-y-4">
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded">
-                            <strong>أسباب الاستقالة:</strong>
-                            <div class="mt-4 space-y-2">
-                                <label class="flex items-center">
-                                    <input type="checkbox" class="ml-2"> ظروف شخصية
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" class="ml-2"> فرصة وظيفية أفضل
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" class="ml-2"> ظروف صحية
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" class="ml-2"> أسباب عائلية
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" class="ml-2"> أخرى: _________________________
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded">
-                            <strong>تفاصيل إضافية:</strong>
-                            <div class="mt-2 h-32 border-2 border-gray-300 rounded p-2"></div>
-                        </div>
-
-                        <div class="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded">
-                            <h4 class="font-bold mb-2">إقرار:</h4>
-                            <p class="text-sm leading-relaxed">
-                                أقر بأنني قد سلمت جميع المواد والمعدات والوثائق الخاصة بالشركة، 
-                                وأنني ملتزم بعدم إفشاء أي معلومات سرية تخص الشركة، وأنني أتحمل المسؤولية 
-                                الكاملة عن صحة البيانات الواردة في هذا الطلب.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="grid md:grid-cols-3 gap-4 mt-8 pt-8 border-t">
-                        <div class="text-center">
-                            <div class="mb-4">توقيع الموظف</div>
-                            <div class="h-16 border-b-2 border-gray-400"></div>
-                            <div class="mt-2 text-sm">التاريخ: ___________</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="mb-4">توقيع المدير المباشر</div>
-                            <div class="h-16 border-b-2 border-gray-400"></div>
-                            <div class="mt-2 text-sm">التاريخ: ___________</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="mb-4">اعتماد الموارد البشرية</div>
-                            <div class="h-16 border-b-2 border-gray-400"></div>
-                            <div class="mt-2 text-sm">التاريخ: ___________</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function generateTerminationForm(employee) {
-            // Keep original implementation with minor improvements
-            return `
-                <div class="text-center mb-8">
-                    <h1 class="text-2xl font-bold mb-2">إشعار إنهاء الخدمات</h1>
-                    <p class="text-gray-600 dark:text-gray-400">نموذج رسمي لإنهاء خدمات الموظف</p>
-                </div>
-
-                <div class="space-y-6">
-                    <div class="grid md:grid-cols-2 gap-4">
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded">
-                            <strong>اسم الموظف:</strong> ${employee.name}
-                        </div>
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded">
-                            <strong>الرقم الوظيفي:</strong> ${employee.employeeId}
-                        </div>
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded">
-                            <strong>المسمى الوظيفي:</strong> ${employee.position}
-                        </div>
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded">
-                            <strong>القسم:</strong> ${employee.department}
-                        </div>
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded">
-                            <strong>تاريخ التعيين:</strong> ${formatDate(employee.hireDate)}
-                        </div>
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded">
-                            <strong>تاريخ إنهاء الخدمة:</strong> ${formatDate(new Date())}
-                        </div>
-                    </div>
-
-                    <div class="p-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                        <h3 class="font-bold mb-4 text-red-800 dark:text-red-300">إشعار رسمي</h3>
-                        <p class="text-lg leading-relaxed">
-                            نحيط علمكم بأنه تم إنهاء خدمات الموظف/ة <strong>${employee.name}</strong> 
-                            حامل/ة الرقم الوظيفي <strong>${employee.employeeId}</strong> من منصب 
-                            <strong>${employee.position}</strong> في <strong>${employee.department}</strong> 
-                            اعتباراً من تاريخ: _______________
-                        </p>
-                    </div>
-
-                    <div class="space-y-4">
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded">
-                            <strong>أسباب إنهاء الخدمة:</strong>
-                            <div class="mt-4 space-y-2">
-                                <label class="flex items-center">
-                                    <input type="checkbox" class="ml-2"> انتهاء مدة العقد
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" class="ml-2"> إنهاء بالتراضي
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" class="ml-2"> لأسباب تأديبية
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" class="ml-2"> إعادة هيكلة
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" class="ml-2"> أسباب صحية
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" class="ml-2"> أخرى: _________________________
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded">
-                            <strong>تفاصيل إضافية:</strong>
-                            <div class="mt-2 h-32 border-2 border-gray-300 rounded p-2"></div>
-                        </div>
-
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded">
-                                <strong>المستحقات المالية:</strong>
-                                <div class="mt-2 space-y-2">
-                                    <div>الراتب المستحق: _______________</div>
-                                    <div>بدل الإجازات: _______________</div>
-                                    <div>مكافأة نهاية الخدمة: _______________</div>
-                                    <div>أخرى: _______________</div>
-                                </div>
-                            </div>
-                            <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded">
-                                <strong>حالة تسليم العهدة:</strong>
-                                <div class="mt-2 space-y-2">
-                                    <label class="flex items-center">
-                                        <input type="checkbox" class="ml-2"> تم تسليم العهدة كاملة
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input type="checkbox" class="ml-2"> هناك مواد لم تسلم
-                                    </label>
-                                    <div class="mt-2">تفاصيل: _____________</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="grid md:grid-cols-3 gap-4 mt-8 pt-8 border-t">
-                        <div class="text-center">
-                            <div class="mb-4">إعداد: شؤون الموظفين</div>
-                            <div class="h-16 border-b-2 border-gray-400"></div>
-                            <div class="mt-2 text-sm">التاريخ: ___________</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="mb-4">مراجعة: المدير العام</div>
-                            <div class="h-16 border-b-2 border-gray-400"></div>
-                            <div class="mt-2 text-sm">التاريخ: ___________</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="mb-4">الختم الرسمي</div>
-                            <div class="w-20 h-20 border-2 border-gray-400 rounded-full mx-auto"></div>
-                            <div class="mt-2 text-sm">ختم الشركة</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Export and Import Functions
+        // Export and save functions
         function saveForm() {
             if (!currentEmployee) {
                 showNotification('لا يوجد نموذج لحفظه', 'error');
@@ -2171,7 +2315,6 @@
                 type: 'saved_form'
             };
 
-            // Save to localStorage as backup
             localStorage.setItem(`form_${Date.now()}`, JSON.stringify(formData));
             showNotification('تم حفظ النموذج بنجاح', 'success');
         }
@@ -2218,40 +2361,6 @@
             }
         }
 
-        function exportToWord() {
-            if (!currentEmployee) {
-                showNotification('يرجى توليد نموذج أولاً', 'error');
-                return;
-            }
-
-            const formContent = document.getElementById('form-preview').innerHTML;
-            const htmlContent = `
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <style>
-                        body { font-family: Arial, sans-serif; direction: rtl; }
-                        .header { text-align: center; margin-bottom: 20px; }
-                        .content { margin: 20px; }
-                    </style>
-                </head>
-                <body>
-                    ${formContent}
-                </body>
-                </html>
-            `;
-
-            const blob = new Blob([htmlContent], { type: 'application/msword' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `نموذج_${currentEmployee.name}_${new Date().toISOString().split('T')[0]}.doc`;
-            link.click();
-            URL.revokeObjectURL(url);
-            
-            showNotification('تم تصدير Word بنجاح', 'success');
-        }
-
         function printForm() {
             if (!currentEmployee) {
                 showNotification('يرجى توليد نموذج أولاً', 'error');
@@ -2260,117 +2369,16 @@
             window.print();
         }
 
-        function shareForm() {
-            if (!currentEmployee) {
-                showNotification('يرجى توليد نموذج أولاً', 'error');
-                return;
-            }
-
-            if (navigator.share) {
-                navigator.share({
-                    title: `نموذج ${currentEmployee.name}`,
-                    text: 'نموذج من نظام إدارة الموارد البشرية',
-                    url: window.location.href
-                });
-            } else {
-                // Fallback - copy to clipboard
-                navigator.clipboard.writeText(window.location.href)
-                    .then(() => showNotification('تم نسخ الرابط للحافظة', 'success'))
-                    .catch(() => showNotification('فشل في نسخ الرابط', 'error'));
-            }
+        function exportAllData() {
+            const worksheet = XLSX.utils.json_to_sheet(employees);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'الموظفين');
+            
+            XLSX.writeFile(workbook, `تقرير_شامل_${new Date().toISOString().split('T')[0]}.xlsx`);
+            showNotification('تم تصدير البيانات الشاملة بنجاح', 'success');
         }
 
-        // Analytics and Charts
-        function initializeCharts() {
-            // Department distribution chart
-            const departmentData = {};
-            employees.forEach(emp => {
-                departmentData[emp.department] = (departmentData[emp.department] || 0) + 1;
-            });
-
-            const deptChart = new Chart(document.getElementById('department-chart'), {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(departmentData),
-                    datasets: [{
-                        data: Object.values(departmentData),
-                        backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe'],
-                        borderWidth: 2,
-                        borderColor: '#fff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
-                }
-            });
-
-            // Forms generation chart (mock data)
-            const formsChart = new Chart(document.getElementById('forms-chart'), {
-                type: 'line',
-                data: {
-                    labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
-                    datasets: [{
-                        label: 'النماذج المولدة',
-                        data: [12, 19, 15, 25, 22, 30],
-                        borderColor: '#667eea',
-                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-
-            // Quick chart for dashboard
-            if (document.getElementById('quick-chart')) {
-                const quickChart = new Chart(document.getElementById('quick-chart'), {
-                    type: 'bar',
-                    data: {
-                        labels: ['موظفين', 'نماذج', 'إجازات'],
-                        datasets: [{
-                            data: [employees.length, generatedForms, 5],
-                            backgroundColor: ['#667eea', '#764ba2', '#f093fb'],
-                            borderRadius: 8
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
-            }
-
-            charts.departmentChart = deptChart;
-            charts.formsChart = formsChart;
-        }
-
-        // Backup and Restore
+        // Backup functions
         function createBackup() {
             const backupData = {
                 employees: employees,
@@ -2445,23 +2453,98 @@
             );
         }
 
-        function exportAllData() {
-            const allData = {
-                employees: employees,
-                stats: {
-                    totalEmployees: employees.length,
-                    totalForms: generatedForms,
-                    exportDate: new Date().toISOString()
-                }
-            };
+        // Analytics and Charts
+        function initializeCharts() {
+            // Department distribution chart
+            const departmentData = {};
+            employees.forEach(emp => {
+                departmentData[emp.department] = (departmentData[emp.department] || 0) + 1;
+            });
 
-            // Export as Excel
-            const worksheet = XLSX.utils.json_to_sheet(employees);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'الموظفين');
-            
-            XLSX.writeFile(workbook, `تقرير_شامل_${new Date().toISOString().split('T')[0]}.xlsx`);
-            showNotification('تم تصدير البيانات الشاملة بنجاح', 'success');
+            if (document.getElementById('department-chart')) {
+                const deptChart = new Chart(document.getElementById('department-chart'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(departmentData),
+                        datasets: [{
+                            data: Object.values(departmentData),
+                            backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe'],
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+                charts.departmentChart = deptChart;
+            }
+
+            // Forms generation chart
+            if (document.getElementById('forms-chart')) {
+                const formsChart = new Chart(document.getElementById('forms-chart'), {
+                    type: 'line',
+                    data: {
+                        labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+                        datasets: [{
+                            label: 'النماذج المولدة',
+                            data: [12, 19, 15, 25, 22, 30],
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+                charts.formsChart = formsChart;
+            }
+
+            // Quick chart for dashboard
+            if (document.getElementById('quick-chart')) {
+                const quickChart = new Chart(document.getElementById('quick-chart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['موظفين', 'نماذج', 'إجازات'],
+                        datasets: [{
+                            data: [employees.length, generatedForms, 5],
+                            backgroundColor: ['#667eea', '#764ba2', '#f093fb'],
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+                charts.quickChart = quickChart;
+            }
         }
 
         // Utility Functions
@@ -2500,7 +2583,9 @@
                 minute: '2-digit'
             });
             const dateString = now.toLocaleDateString('ar-SA');
-            document.getElementById('current-time').textContent = `${timeString} - ${dateString}`;
+            if (document.getElementById('current-time')) {
+                document.getElementById('current-time').textContent = `${timeString} - ${dateString}`;
+            }
         }
 
         // Notification System
@@ -2551,7 +2636,7 @@
             const modal = document.createElement('div');
             modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
             modal.innerHTML = `
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full mx-4 animate-slide-up">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full mx-4 animate-scale-in">
                     <div class="flex items-center mb-4">
                         <i class="fas fa-exclamation-triangle text-yellow-500 text-xl ml-3"></i>
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white">تأكيد العملية</h3>
@@ -2575,7 +2660,7 @@
             const recentActivity = document.getElementById('recent-activity');
             if (recentActivity) {
                 const activityItem = document.createElement('div');
-                activityItem.className = 'flex items-center space-x-3 space-x-reverse p-3 bg-gray-50 dark:bg-gray-700 rounded-lg';
+                activityItem.className = 'flex items-center space-x-3 space-x-reverse p-3 bg-gray-50 dark:bg-gray-700 rounded-lg animate-fade-in';
                 activityItem.innerHTML = `
                     <div class="w-2 h-2 bg-green-500 rounded-full"></div>
                     <div class="flex-1">
@@ -2610,10 +2695,13 @@
                 updateCurrentTime();
                 setInterval(updateCurrentTime, 60000);
                 
-                // Load employees (sample data if Firebase fails)
-                await loadEmployees();
+                // Initialize empty employees array - no sample data
+                employees = [];
                 
-                // Initialize dashboard
+                filteredEmployees = [...employees];
+                updateEmployeesTable();
+                updateEmployeeSelect();
+                updateFilters();
                 updateDashboardStats();
                 
                 // Show dashboard by default
@@ -2633,75 +2721,6 @@
             }
         }
 
-        async function loadEmployees() {
-            try {
-                if (typeof db !== 'undefined') {
-                    const querySnapshot = await db.collection('employees').get();
-                    employees = [];
-                    querySnapshot.forEach((doc) => {
-                        employees.push({ id: doc.id, ...doc.data() });
-                    });
-                } else {
-                    throw new Error('Firebase not available');
-                }
-            } catch (error) {
-                console.log('Using sample data...');
-                // Initialize with sample data
-                employees = [
-                    {
-                        name: 'أحمد محمد علي',
-                        employeeId: 'EMP001',
-                        position: 'مطور برمجيات أول',
-                        department: 'تقنية المعلومات',
-                        hireDate: '2022-01-15',
-                        salary: '15000',
-                        nationalId: '1234567890',
-                        email: 'ahmed.ali@company.com',
-                        phone: '0501234567',
-                        maritalStatus: 'متزوج',
-                        birthDate: '1990-05-20',
-                        address: 'الرياض، حي النرجس',
-                        status: 'active'
-                    },
-                    {
-                        name: 'فاطمة أحمد السالم',
-                        employeeId: 'EMP002',
-                        position: 'محاسبة أولى',
-                        department: 'المالية',
-                        hireDate: '2021-03-10',
-                        salary: '12000',
-                        nationalId: '9876543210',
-                        email: 'fatima.salem@company.com',
-                        phone: '0507654321',
-                        maritalStatus: 'أعزب',
-                        birthDate: '1988-12-15',
-                        address: 'الرياض، حي الملز',
-                        status: 'active'
-                    },
-                    {
-                        name: 'خالد عبدالله المطيري',
-                        employeeId: 'EMP003',
-                        position: 'مدير مبيعات',
-                        department: 'المبيعات',
-                        hireDate: '2020-07-22',
-                        salary: '18000',
-                        nationalId: '5678901234',
-                        email: 'khalid.mutairi@company.com',
-                        phone: '0509876543',
-                        maritalStatus: 'متزوج',
-                        birthDate: '1985-03-08',
-                        address: 'الرياض، حي العليا',
-                        status: 'on-leave'
-                    }
-                ];
-            }
-            
-            filteredEmployees = [...employees];
-            updateEmployeesTable();
-            updateEmployeeSelect();
-            updateFilters();
-        }
-
         // Event Listeners
         document.addEventListener('DOMContentLoaded', initializeApp);
         
@@ -2712,14 +2731,7 @@
         window.addEventListener('resize', () => {
             if (window.innerWidth >= 1024) {
                 document.getElementById('sidebar').classList.remove('open');
-                document.getElementById('sidebar-overlay').classList.add('hidden');
-            }
-        });
-
-        // Close modals when clicking outside
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('fixed') && e.target.classList.contains('inset-0')) {
-                e.target.style.display = 'none';
+                document.getElementById('sidebar-overlay').classList.remove('active');
             }
         });
 
@@ -2749,6 +2761,12 @@
                         modal.classList.add('hidden');
                     }
                 });
+                
+                // Close sidebar if open
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar.classList.contains('open')) {
+                    toggleSidebar();
+                }
             }
         });
     </script>
