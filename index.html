@@ -71,6 +71,16 @@
                 padding-bottom: 8px !important;
                 margin-bottom: 10px !important;
                 border-bottom: 2px solid #2563eb !important;
+                background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .professional-header {
+                background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
             .form-header h1 {
                 font-size: 20px !important;
@@ -87,12 +97,6 @@
                 width: 60px !important;
                 height: 60px !important;
                 font-size: 16px !important;
-                background-image: var(--school-logo-image) !important;
-                background-size: cover !important;
-                background-position: center !important;
-                background-repeat: no-repeat !important;
-                -webkit-print-color-adjust: exact !important;
-                color-adjust: exact !important;
             }
             .info-grid {
                 padding: 10px !important;
@@ -172,7 +176,7 @@
         
         /* لتغيير شعار المدرسة، قم بتحديث هذا المتغير بـ URL الصورة الجديدة */
         :root {
-            --school-logo-image: url('https://www2.0zz0.com/2025/12/15/08/207758184.jpeg');
+            --school-logo-image: url('https://www2.0zz0.com/2025/12/15/09/216505402.jpg');
         }
         
         .form-border {
@@ -290,6 +294,10 @@
             border-bottom: 4px solid #2563eb;
             padding-bottom: 25px;
             margin-bottom: 30px;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+            -webkit-print-color-adjust: exact !important;
+            color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
         
         .form-content-section {
@@ -357,6 +365,9 @@
         .professional-header {
             background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
             border-bottom: 4px solid #0ea5e9;
+            -webkit-print-color-adjust: exact !important;
+            color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
     </style>
 </head>
@@ -604,7 +615,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    <i class="fas fa-user mr-1"></i>اسم الموظف الكامل
+                                    <i class="fas fa-user mr-1"></i><span id="employeeNameLabel">اسم الموظف الكامل</span>
                                 </label>
                                 <input type="text" id="employeeName" placeholder="أدخل الاسم الكامل" 
                                        class="input-enhanced w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-base transition-all">
@@ -613,7 +624,7 @@
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     <i class="fas fa-id-card mr-1"></i>رقم الهوية الوطنية
                                 </label>
-                                <input type="text" id="employeeId" placeholder="أدخل رقم الهوية"
+                                <input type="text" id="employeeId" placeholder="1234567890" maxlength="10"
                                        class="input-enhanced w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-base transition-all">
                             </div>
                             <div>
@@ -728,7 +739,7 @@
                     <!-- Employee Information -->
                     <div class="info-grid mb-4">
                         <div class="info-item">
-                            <strong>اسم الموظف:</strong>
+                            <strong><span id="displayEmployeeNameHeader">اسم الموظف</span>:</strong>
                             <span id="displayEmployeeName" class="mr-2">___________________</span>
                         </div>
                         <div class="info-item">
@@ -786,7 +797,7 @@
                         <div class="grid grid-cols-3 gap-4">
                             <div class="text-center">
                                 <div class="signature-box mb-2"></div>
-                                <p class="font-bold text-blue-800 text-xs">توقيع الموظف</p>
+                                <p class="font-bold text-blue-800 text-xs"><span id="signatureLabel1">توقيع الموظف</span></p>
                                 <p class="text-xs text-gray-600">التاريخ: ___________</p>
                             </div>
                             <div class="text-center">
@@ -803,7 +814,7 @@
                         
                         <!-- Footer Info -->
                         <div class="mt-4 pt-2 border-t-2 border-gray-200 text-center text-xs text-gray-500">
-                            <p>هذا النموذج سري ولا يجوز تداوله إلا للمخول لهم بذلك | جميع الحقوق محفوظة © 2024</p>
+                            <p>هذا النموذج سري ولا يجوز تداوله إلا للمخول لهم بذلك | جميع الحقوق محفوظة © 2025</p>
                         </div>
                     </div>
                 </div>
@@ -821,11 +832,32 @@
             // Clear additional fields
             document.getElementById('additionalFields').innerHTML = '';
             
+            // Update field labels based on form type
+            updateFieldLabels(type);
+            
             // Add specific fields based on form type
             addSpecificFields(type);
             
             // Set current date
             document.getElementById('formDate').value = new Date().toISOString().split('T')[0];
+            
+            // Smooth scroll to form fields
+            setTimeout(() => {
+                document.getElementById('formFields').scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }, 100);
+        }
+        
+        function updateFieldLabels(type) {
+            const employeeNameLabel = document.getElementById('employeeNameLabel');
+            
+            if (type === 'no-transport') {
+                employeeNameLabel.textContent = 'اسم ولي الأمر الكامل';
+            } else {
+                employeeNameLabel.textContent = 'اسم الموظف الكامل';
+            }
         }
         
         function addSpecificFields(type) {
@@ -1036,6 +1068,15 @@
             document.getElementById('headerSchoolPhone').textContent = document.getElementById('schoolPhone').value;
             document.getElementById('headerSchoolAddress').textContent = document.getElementById('schoolAddress').value;
             
+            // Update display labels based on form type
+            if (selectedFormType === 'no-transport') {
+                document.getElementById('displayEmployeeNameHeader').textContent = 'ولي الأمر';
+                document.getElementById('signatureLabel1').textContent = 'توقيع ولي الأمر';
+            } else {
+                document.getElementById('displayEmployeeNameHeader').textContent = 'اسم الموظف';
+                document.getElementById('signatureLabel1').textContent = 'توقيع الموظف';
+            }
+            
             // Fill form header data
             document.getElementById('formTitle').textContent = formTitles[selectedFormType];
             document.getElementById('displayEmployeeName').textContent = employeeName;
@@ -1050,7 +1091,7 @@
             document.getElementById('allFormData').innerHTML = '<strong>جميع البيانات المدخلة:</strong><br>' + allData;
             
             // Generate form number and reference
-            const formNumber = '2024' + Math.random().toString().substr(2, 6);
+            const formNumber = '2025' + Math.random().toString().substr(2, 6);
             const referenceNumber = selectedFormType.toUpperCase() + '-' + Math.random().toString().substr(2, 4);
             document.getElementById('formNumber').textContent = formNumber;
             document.getElementById('referenceNumber').textContent = referenceNumber;
@@ -1072,7 +1113,7 @@
             
             // Basic fields
             const basicFields = [
-                { id: 'employeeName', label: 'اسم الموظف' },
+                { id: 'employeeName', label: selectedFormType === 'no-transport' ? 'ولي الأمر' : 'اسم الموظف' },
                 { id: 'employeeId', label: 'رقم الهوية' },
                 { id: 'jobTitle', label: 'المسمى الوظيفي' },
                 { id: 'formDate', label: 'تاريخ الإجراء' },
@@ -1101,6 +1142,7 @@
         
         function generateFormContent(type, data) {
             const date = new Date(data.formDate).toLocaleDateString('en-GB');
+            const personLabel = type === 'no-transport' ? 'ولي الأمر' : 'الموظف/ة';
             
             let content = '';
             
@@ -1191,7 +1233,7 @@
                 case 'no-transport':
                     content += `
                         <p class="text-sm leading-relaxed mb-4">
-                            نعلمكم أنه تم الإعلام بعدم استخدام خدمة النقل المدرسي للطالب/ة ابن/ابنة الموظف/ة <strong>${data.employeeName}</strong> للعام الدراسي الحالي.<br>
+                            نعلمكم أنه تم الإعلام بعدم استخدام خدمة النقل المدرسي للطالب/ة ابن/ابنة <strong>${data.employeeName}</strong> للعام الدراسي الحالي.<br>
                             يتحمل ولي الأمر مسؤولية النقل والالتزام بمواعيد الحضور والانصراف والمسؤولية الكاملة عن سلامة الطالب/ة أثناء النقل.
                         </p>
                     `;
@@ -1322,66 +1364,60 @@
                 const formTitle = document.getElementById('formTitle').textContent;
                 const filename = `${formTitle}_${new Date().toISOString().split('T')[0]}.pdf`;
 
-                // Set a delay to ensure all images and logos are loaded
-                setTimeout(() => {
-                    // Create canvas with high resolution and better options for logo rendering
-                    html2canvas(element, {
-                        scale: 3,
-                        useCORS: true,
-                        allowTaint: true,
-                        backgroundColor: '#ffffff',
-                        width: element.scrollWidth,
-                        height: element.scrollHeight,
-                        windowWidth: element.scrollWidth,
-                        windowHeight: element.scrollHeight,
-                        logging: false,
-                        imageTimeout: 5000,
-                        foreignObjectRendering: true
-                    }).then(canvas => {
-                        try {
-                            const imgData = canvas.toDataURL('image/png', 1.0);
+                // Create canvas with high resolution
+                html2canvas(element, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    width: element.scrollWidth,
+                    height: element.scrollHeight,
+                    windowWidth: element.scrollWidth,
+                    windowHeight: element.scrollHeight
+                }).then(canvas => {
+                    try {
+                        const imgData = canvas.toDataURL('image/png', 1.0);
+                        
+                        // Create PDF with proper A4 dimensions
+                        const { jsPDF } = window.jspdf;
+                        const pdf = new jsPDF('p', 'mm', 'a4');
+                        
+                        // A4 dimensions in mm
+                        const pdfWidth = 210;
+                        const pdfHeight = 297;
+                        
+                        // Calculate image dimensions to fit A4
+                        const imgWidth = pdfWidth;
+                        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                        
+                        // If image is taller than A4, scale it down
+                        if (imgHeight > pdfHeight) {
+                            const scale = pdfHeight / imgHeight;
+                            const scaledWidth = imgWidth * scale;
+                            const scaledHeight = pdfHeight;
+                            const xOffset = (pdfWidth - scaledWidth) / 2;
                             
-                            // Create PDF with proper A4 dimensions
-                            const { jsPDF } = window.jspdf;
-                            const pdf = new jsPDF('p', 'mm', 'a4');
-                            
-                            // A4 dimensions in mm
-                            const pdfWidth = 210;
-                            const pdfHeight = 297;
-                            
-                            // Calculate image dimensions to fit A4
-                            const imgWidth = pdfWidth;
-                            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                            
-                            // If image is taller than A4, scale it down
-                            if (imgHeight > pdfHeight) {
-                                const scale = pdfHeight / imgHeight;
-                                const scaledWidth = imgWidth * scale;
-                                const scaledHeight = pdfHeight;
-                                const xOffset = (pdfWidth - scaledWidth) / 2;
-                                
-                                pdf.addImage(imgData, 'PNG', xOffset, 0, scaledWidth, scaledHeight, '', 'FAST');
-                            } else {
-                                // Center the image vertically
-                                const yOffset = (pdfHeight - imgHeight) / 2;
-                                pdf.addImage(imgData, 'PNG', 0, yOffset, imgWidth, imgHeight, '', 'FAST');
-                            }
-                            
-                            pdf.save(filename);
-                            hideLoadingSpinner();
-                            incrementDownloadCount();
-                            showNotification('تم تحميل ملف PDF مع اللوجو بنجاح', 'success');
-                        } catch (pdfError) {
-                            hideLoadingSpinner();
-                            console.error('PDF creation error:', pdfError);
-                            showNotification('حدث خطأ أثناء إنشاء ملف PDF', 'error');
+                            pdf.addImage(imgData, 'PNG', xOffset, 0, scaledWidth, scaledHeight, '', 'FAST');
+                        } else {
+                            // Center the image vertically
+                            const yOffset = (pdfHeight - imgHeight) / 2;
+                            pdf.addImage(imgData, 'PNG', 0, yOffset, imgWidth, imgHeight, '', 'FAST');
                         }
-                    }).catch(canvasError => {
+                        
+                        pdf.save(filename);
                         hideLoadingSpinner();
-                        console.error('Canvas creation error:', canvasError);
-                        showNotification('حدث خطأ أثناء تحضير الصورة', 'error');
-                    });
-                }, 500); // Give time for logo to load
+                        incrementDownloadCount();
+                        showNotification('تم تحميل ملف PDF بنجاح', 'success');
+                    } catch (pdfError) {
+                        hideLoadingSpinner();
+                        console.error('PDF creation error:', pdfError);
+                        showNotification('حدث خطأ أثناء إنشاء ملف PDF', 'error');
+                    }
+                }).catch(canvasError => {
+                    hideLoadingSpinner();
+                    console.error('Canvas creation error:', canvasError);
+                    showNotification('حدث خطأ أثناء تحضير الصورة', 'error');
+                });
             } catch (generalError) {
                 hideLoadingSpinner();
                 console.error('General PDF error:', generalError);
