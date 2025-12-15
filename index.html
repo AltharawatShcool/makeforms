@@ -134,11 +134,10 @@
             }
         }
         
-        /* تحديث: الشعار الآن يمكن تغييره بسهولة عبر استبدال الصور في المتغير أدناه */
+        /* شعار المدرسة الاحترافي */
         .school-logo {
             width: 120px;
             height: 120px;
-            background: linear-gradient(135deg, #5D5CDE 0%, #3B82F6 50%, #10B981 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -148,10 +147,21 @@
             font-size: 28px;
             box-shadow: 0 8px 32px rgba(93, 92, 222, 0.3);
             border: 4px solid white;
-            background-image: var(--school-logo-image, none);
+            background-image: var(--school-logo-image);
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .school-logo::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #5D5CDE 0%, #3B82F6 50%, #10B981 100%);
+            opacity: 0.9;
+            z-index: -1;
         }
         
         /* لتغيير شعار المدرسة، قم بتحديث هذا المتغير بـ URL الصورة الجديدة */
@@ -306,6 +316,42 @@
             padding-top: 30px;
             margin-top: auto;
         }
+
+        /* تحسينات التصميم الاحترافي */
+        .premium-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .premium-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.6);
+        }
+        
+        .form-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .input-enhanced {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .input-enhanced:focus {
+            background: white;
+            border-color: #5D5CDE;
+            box-shadow: 0 0 0 3px rgba(93, 92, 222, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .professional-header {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border-bottom: 4px solid #0ea5e9;
+        }
     </style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 font-arabic">
@@ -328,13 +374,10 @@
         <div class="max-w-4xl mx-auto px-4">
             
             <!-- Header -->
-            <div class="gradient-bg rounded-2xl p-8 mb-8 no-print text-center text-white relative overflow-hidden">
+            <div class="premium-card rounded-2xl p-8 mb-8 no-print text-center text-white relative overflow-hidden">
                 <div class="watermark">الثروات</div>
                 <div class="relative z-10">
-                    <div class="school-logo mx-auto mb-4 animate-pulse-slow">
-                        <!-- يمكن استبدال النص بشعار الصورة عبر تحديث متغير --school-logo-image في CSS أعلاه -->
-                        ث.و
-                    </div>
+                    <div class="school-logo mx-auto mb-4 animate-pulse-slow"></div>
                     <h1 class="text-4xl font-bold mb-2 animate-fade-in">مولد النماذج المدرسية المتقدم</h1>
                     <p class="text-xl opacity-90 mb-4">مدرسة الثروات الوطنية الخاصة</p>
                     <div class="flex justify-center space-x-6 text-sm opacity-80">
@@ -406,23 +449,19 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">اسم المدرسة</label>
-                            <input type="text" id="schoolName" value="مدرسة الثروات الوطنية الخاصة" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
+                            <input type="text" id="schoolName" value="مدرسة الثروات الوطنية الخاصة" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">الاسم الإنجليزي</label>
-                            <input type="text" id="schoolNameEn" value="AlTharawat National Private School" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
+                            <input type="text" id="schoolNameEn" value="AlTharawat National Private School" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">رقم الهاتف</label>
-                            <input type="text" id="schoolPhone" value="0543837551" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">البريد الإلكتروني</label>
-                            <input type="email" id="schoolEmail" value="schoolsschool2019@gmail.com" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
+                            <input type="text" id="schoolPhone" value="0543837551" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
                         </div>
                         <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">العنوان</label>
-                            <input type="text" id="schoolAddress" value="الإمارات - بني شرق 9" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
+                            <input type="text" id="schoolAddress" value="الإمارات - بني شرق 9" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
                         </div>
                     </div>
                     <button onclick="saveSettings()" class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
@@ -443,10 +482,10 @@
                     <div class="flex flex-col md:flex-row gap-4">
                         <div class="flex-1">
                             <input type="text" id="searchForms" placeholder="البحث في النماذج..." 
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
+                                   class="input-enhanced w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
                         </div>
                         <div>
-                            <select id="categoryFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
+                            <select id="categoryFilter" class="input-enhanced px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
                                 <option value="">جميع الفئات</option>
                                 <option value="hr">الموارد البشرية</option>
                                 <option value="admin">إدارية</option>
@@ -549,24 +588,6 @@
                     </button>
                 </div>
 
-                <!-- Step Indicator -->
-                <div id="stepIndicator" class="hidden mb-6">
-                    <div class="flex justify-center space-x-4">
-                        <div class="step-indicator flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 text-gray-600 font-bold">1</div>
-                        <div class="w-16 h-1 bg-gray-300 mt-5"></div>
-                        <div class="step-indicator flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 text-gray-600 font-bold">2</div>
-                        <div class="w-16 h-1 bg-gray-300 mt-5"></div>
-                        <div class="step-indicator flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 text-gray-600 font-bold">3</div>
-                    </div>
-                    <div class="flex justify-center space-x-4 text-sm mt-2">
-                        <span>اختيار النموذج</span>
-                        <span class="w-16"></span>
-                        <span>إدخال البيانات</span>
-                        <span class="w-16"></span>
-                        <span>المعاينة والطباعة</span>
-                    </div>
-                </div>
-
                 <!-- Form Fields -->
                 <div id="formFields" class="hidden animate-slide-up">
                     <div class="form-section p-6 rounded-lg mb-6">
@@ -580,20 +601,20 @@
                                     <i class="fas fa-user mr-1"></i>اسم الموظف الكامل
                                 </label>
                                 <input type="text" id="employeeName" placeholder="أدخل الاسم الكامل" 
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-base transition-all">
+                                       class="input-enhanced w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-base transition-all">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     <i class="fas fa-id-card mr-1"></i>رقم الهوية الوطنية
                                 </label>
                                 <input type="text" id="employeeId" placeholder="1234567890" maxlength="10"
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-base transition-all">
+                                       class="input-enhanced w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-base transition-all">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     <i class="fas fa-briefcase mr-1"></i>المسمى الوظيفي
                                 </label>
-                                <select id="jobTitle" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-base transition-all">
+                                <select id="jobTitle" class="input-enhanced w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-base transition-all">
                                     <option value="">اختر المسمى الوظيفي</option>
                                     <option value="معلم/ة">معلم/ة</option>
                                     <option value="معلم أول">معلم أول</option>
@@ -610,24 +631,24 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    <i class="fas fa-calendar mr-1"></i>التاريخ (ميلادي)
+                                    <i class="fas fa-calendar mr-1"></i>تاريخ الإجراء (ميلادي)
                                 </label>
                                 <input type="date" id="formDate" 
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-base transition-all">
+                                       class="input-enhanced w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-base transition-all">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     <i class="fas fa-phone mr-1"></i>رقم الهاتف
                                 </label>
                                 <input type="tel" id="employeePhone" placeholder="+971 50 123 4567"
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-base transition-all">
+                                       class="input-enhanced w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-base transition-all">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    <i class="fas fa-envelope mr-1"></i>البريد الإلكتروني
+                                    <i class="fas fa-building mr-1"></i>القسم/الإدارة
                                 </label>
-                                <input type="email" id="employeeEmail" placeholder="example@email.com"
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-base transition-all">
+                                <input type="text" id="department" placeholder="قسم التدريس، الإدارة، إلخ..."
+                                       class="input-enhanced w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-base transition-all">
                             </div>
                         </div>
                     </div>
@@ -675,30 +696,26 @@
             <div id="printArea" class="bg-white rounded-lg shadow-lg hidden">
                 <div class="form-border">
                     <!-- Header with Logo -->
-                    <div class="form-header">
+                    <div class="form-header professional-header">
                         <div class="flex items-center justify-between mb-4">
-                            <!-- الشعار الأيسر: يمكن تغييره بتحديث متغير CSS أو استبدال هذا العنصر بـ <img> -->
-                            <div class="school-logo">
-                                ث.و
-                            </div>
+                            <!-- الشعار الأيسر: صورة المدرسة -->
+                            <div class="school-logo"></div>
                             <div class="text-center flex-1 mx-8">
-                                <h1 class="text-2xl font-bold text-blue-800 mb-2">مدرسة الثروات الوطنية الخاصة</h1>
-                                <h2 class="text-lg font-bold text-blue-600 mb-2">AlTharawat National Private School</h2>
-                                <div class="text-xs text-blue-500">
-                                    <p>هاتف: 0543837551 | البريد: schoolsschool2019@gmail.com</p>
-                                    <p>العنوان: الإمارات - بني شرق 9</p>
+                                <h1 class="text-2xl font-bold text-white mb-2" id="headerSchoolName">مدرسة الثروات الوطنية الخاصة</h1>
+                                <h2 class="text-lg font-bold text-blue-200 mb-2" id="headerSchoolNameEn">AlTharawat National Private School</h2>
+                                <div class="text-xs text-blue-100">
+                                    <p>هاتف: <span id="headerSchoolPhone">0543837551</span></p>
+                                    <p>العنوان: <span id="headerSchoolAddress">الإمارات - بني شرق 9</span></p>
                                 </div>
                             </div>
                             <!-- الشعار الأيمن: نسخة مطابقة من الشعار الأيسر -->
-                            <div class="school-logo">
-                                ث.و
-                            </div>
+                            <div class="school-logo"></div>
                         </div>
 
                         <!-- Form Title -->
                         <div class="text-center">
-                            <h2 id="formTitle" class="text-xl font-bold text-blue-800 border-4 border-blue-800 inline-block px-6 py-2 rounded-lg bg-blue-50"></h2>
-                            <p class="text-xs text-gray-600 mt-1">نموذج رقم: #<span id="formNumber">2024001</span></p>
+                            <h2 id="formTitle" class="text-xl font-bold text-white border-4 border-white inline-block px-6 py-2 rounded-lg bg-blue-600"></h2>
+                            <p class="text-xs text-blue-100 mt-1">نموذج رقم: #<span id="formNumber">2024001</span></p>
                         </div>
                     </div>
 
@@ -717,7 +734,7 @@
                             <span id="displayJobTitle" class="mr-2">___________________</span>
                         </div>
                         <div class="info-item">
-                            <strong>التاريخ:</strong>
+                            <strong>تاريخ الإجراء:</strong>
                             <span id="displayFormDate" class="mr-2">___________________</span>
                         </div>
                         <div class="info-item">
@@ -725,8 +742,8 @@
                             <span id="displayEmployeePhone" class="mr-2">___________________</span>
                         </div>
                         <div class="info-item">
-                            <strong>البريد الإلكتروني:</strong>
-                            <span id="displayEmployeeEmail" class="mr-2">___________________</span>
+                            <strong>القسم/الإدارة:</strong>
+                            <span id="displayDepartment" class="mr-2">___________________</span>
                         </div>
                     </div>
 
@@ -748,6 +765,7 @@
                                 <p><strong>الحالة:</strong> <span class="text-green-600 font-semibold">معتمد</span></p>
                                 <p><strong>الأولوية:</strong> <span class="text-blue-600 font-semibold">عادية</span></p>
                             </div>
+                            <div id="allFormData" class="mt-3 p-2 bg-blue-50 rounded text-xs"></div>
                         </div>
                     </div>
 
@@ -819,15 +837,15 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">تاريخ بداية الإجازة</label>
-                                    <input type="date" id="vacationStart" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
+                                    <input type="date" id="vacationStart" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">تاريخ نهاية الإجازة</label>
-                                    <input type="date" id="vacationEnd" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
+                                    <input type="date" id="vacationEnd" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">نوع الإجازة</label>
-                                    <select id="vacationType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
+                                    <select id="vacationType" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
                                         <option value="">اختر نوع الإجازة</option>
                                         <option value="سنوية">إجازة سنوية</option>
                                         <option value="مرضية">إجازة مرضية</option>
@@ -838,11 +856,11 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">عدد الأيام</label>
-                                    <input type="number" id="vacationDays" placeholder="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
+                                    <input type="number" id="vacationDays" placeholder="0" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
                                 </div>
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">سبب الإجازة</label>
-                                    <textarea id="vacationReason" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base"></textarea>
+                                    <textarea id="vacationReason" rows="3" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -858,23 +876,23 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">وقت الخروج</label>
-                                    <input type="time" id="exitTime" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
+                                    <input type="time" id="exitTime" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">وقت العودة المتوقع</label>
-                                    <input type="time" id="returnTime" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
+                                    <input type="time" id="returnTime" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">المدة (بالساعات)</label>
-                                    <input type="number" id="duration" placeholder="0" step="0.5" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
+                                    <input type="number" id="duration" placeholder="0" step="0.5" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">الوجهة</label>
-                                    <input type="text" id="destination" placeholder="مكان الذهاب" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
+                                    <input type="text" id="destination" placeholder="مكان الذهاب" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
                                 </div>
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">سبب الخروج</label>
-                                    <textarea id="exitReason" rows="3" placeholder="اذكر السبب التفصيلي للخروج" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base"></textarea>
+                                    <textarea id="exitReason" rows="3" placeholder="اذكر السبب التفصيلي للخروج" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -891,7 +909,7 @@
                             <div class="space-y-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">نوع العهدة</label>
-                                    <select id="custodyType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
+                                    <select id="custodyType" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
                                         <option value="">اختر نوع العهدة</option>
                                         <option value="أجهزة إلكترونية">أجهزة إلكترونية</option>
                                         <option value="أثاث مكتبي">أثاث مكتبي</option>
@@ -903,16 +921,16 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">تفاصيل العهدة</label>
-                                    <textarea id="custodyDetails" rows="4" placeholder="اذكر تفاصيل الأصناف المستلمة/المسلمة مع الكميات والأرقام التسلسلية إن وجدت" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base"></textarea>
+                                    <textarea id="custodyDetails" rows="4" placeholder="اذكر تفاصيل الأصناف المستلمة/المسلمة مع الكميات والأرقام التسلسلية إن وجدت" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base"></textarea>
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">القيمة التقديرية</label>
-                                        <input type="number" id="estimatedValue" placeholder="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
+                                        <input type="number" id="estimatedValue" placeholder="0" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">الحالة</label>
-                                        <select id="custodyCondition" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
+                                        <select id="custodyCondition" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
                                             <option value="">اختر الحالة</option>
                                             <option value="ممتازة">ممتازة</option>
                                             <option value="جيدة">جيدة</option>
@@ -936,7 +954,7 @@
                             <div class="space-y-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">نوع ${type === 'warning' ? 'الإنذار' : 'المخالفة'}</label>
-                                    <select id="violationType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
+                                    <select id="violationType" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
                                         <option value="">اختر النوع</option>
                                         <option value="تأخير">تأخير في الحضور</option>
                                         <option value="غياب">غياب بدون عذر</option>
@@ -948,15 +966,15 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">التاريخ والوقت</label>
-                                    <input type="datetime-local" id="violationDateTime" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
+                                    <input type="datetime-local" id="violationDateTime" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">تفاصيل ${type === 'warning' ? 'الإنذار' : 'المخالفة'}</label>
-                                    <textarea id="details" rows="3" placeholder="اذكر التفاصيل الكاملة للمخالفة أو سبب الإنذار" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base"></textarea>
+                                    <textarea id="details" rows="3" placeholder="اذكر التفاصيل الكاملة للمخالفة أو سبب الإنذار" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base"></textarea>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">الإجراء المطلوب</label>
-                                    <textarea id="requiredAction" rows="2" placeholder="ما هو الإجراء المطلوب من الموظف" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base"></textarea>
+                                    <textarea id="requiredAction" rows="2" placeholder="ما هو الإجراء المطلوب من الموظف" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -971,7 +989,7 @@
                             </h3>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ملاحظات</label>
-                                <textarea id="additionalDetails" rows="4" placeholder="أضف أي تفاصيل إضافية تخص النموذج" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base"></textarea>
+                                <textarea id="additionalDetails" rows="4" placeholder="أضف أي تفاصيل إضافية تخص النموذج" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base"></textarea>
                             </div>
                         </div>
                     `;
@@ -1006,6 +1024,12 @@
                 'violation': 'نموذج مخالفة'
             };
             
+            // Update header with settings data
+            document.getElementById('headerSchoolName').textContent = document.getElementById('schoolName').value;
+            document.getElementById('headerSchoolNameEn').textContent = document.getElementById('schoolNameEn').value;
+            document.getElementById('headerSchoolPhone').textContent = document.getElementById('schoolPhone').value;
+            document.getElementById('headerSchoolAddress').textContent = document.getElementById('schoolAddress').value;
+            
             // Fill form header data
             document.getElementById('formTitle').textContent = formTitles[selectedFormType];
             document.getElementById('displayEmployeeName').textContent = employeeName;
@@ -1013,7 +1037,11 @@
             document.getElementById('displayJobTitle').textContent = jobTitle;
             document.getElementById('displayFormDate').textContent = new Date(formDate).toLocaleDateString('en-GB');
             document.getElementById('displayEmployeePhone').textContent = document.getElementById('employeePhone').value || 'غير محدد';
-            document.getElementById('displayEmployeeEmail').textContent = document.getElementById('employeeEmail').value || 'غير محدد';
+            document.getElementById('displayDepartment').textContent = document.getElementById('department').value || 'غير محدد';
+            
+            // Collect all form data
+            const allData = collectAllFormData();
+            document.getElementById('allFormData').innerHTML = '<strong>جميع البيانات المدخلة:</strong><br>' + allData;
             
             // Generate form number and reference
             const formNumber = '2024' + Math.random().toString().substr(2, 6);
@@ -1031,6 +1059,38 @@
             
             // Scroll to generated form
             document.getElementById('printArea').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function collectAllFormData() {
+            const data = [];
+            
+            // Basic fields
+            const basicFields = [
+                { id: 'employeeName', label: 'اسم الموظف' },
+                { id: 'employeeId', label: 'رقم الهوية' },
+                { id: 'jobTitle', label: 'المسمى الوظيفي' },
+                { id: 'formDate', label: 'تاريخ الإجراء' },
+                { id: 'employeePhone', label: 'رقم الهاتف' },
+                { id: 'department', label: 'القسم/الإدارة' }
+            ];
+            
+            basicFields.forEach(field => {
+                const element = document.getElementById(field.id);
+                if (element && element.value) {
+                    data.push(`${field.label}: ${element.value}`);
+                }
+            });
+            
+            // Additional fields based on form type
+            const additionalElements = document.getElementById('additionalFields').querySelectorAll('input, select, textarea');
+            additionalElements.forEach(element => {
+                if (element.value) {
+                    const label = element.previousElementSibling?.textContent || element.id;
+                    data.push(`${label}: ${element.value}`);
+                }
+            });
+            
+            return data.join(' | ');
         }
         
         function generateFormContent(type, data) {
@@ -1052,11 +1112,14 @@
                     const vacationStart = document.getElementById('vacationStart')?.value;
                     const vacationEnd = document.getElementById('vacationEnd')?.value;
                     const vacationType = document.getElementById('vacationType')?.value;
+                    const vacationReason = document.getElementById('vacationReason')?.value;
                     
                     content += `
                         <p class="text-sm leading-relaxed mb-4">
                             نعلمكم أنه تم طلب إجازة من الموظف/ة <strong>${data.employeeName}</strong> من تاريخ <strong>${vacationStart ? new Date(vacationStart).toLocaleDateString('en-GB') : '___________'}</strong> إلى تاريخ <strong>${vacationEnd ? new Date(vacationEnd).toLocaleDateString('en-GB') : '___________'}</strong>.<br>
-                            نوع الإجازة: <strong>${vacationType || 'غير محدد'}</strong>. نرجو الموافقة على طلب الإجازة مع مراعاة احتياجات العمل.
+                            نوع الإجازة: <strong>${vacationType || 'غير محدد'}</strong><br>
+                            سبب الإجازة: <strong>${vacationReason || 'غير محدد'}</strong><br>
+                            نرجو الموافقة على طلب الإجازة مع مراعاة احتياجات العمل.
                         </p>
                     `;
                     break;
@@ -1083,11 +1146,14 @@
                     const exitTime = document.getElementById('exitTime')?.value;
                     const returnTime = document.getElementById('returnTime')?.value;
                     const destination = document.getElementById('destination')?.value;
+                    const exitReason = document.getElementById('exitReason')?.value;
                     
                     content += `
                         <p class="text-sm leading-relaxed mb-4">
                             نعلمكم أنه تم طلب إذن خروج أثناء العمل للموظف/ة <strong>${data.employeeName}</strong> في تاريخ <strong>${date}</strong> من الساعة <strong>${exitTime || '___'}</strong> إلى الساعة <strong>${returnTime || '___'}</strong>.<br>
-                            الوجهة: <strong>${destination || 'غير محدد'}</strong>. نرجو الموافقة على طلب الخروج مع التأكيد على العودة في الوقت المحدد.
+                            الوجهة: <strong>${destination || 'غير محدد'}</strong><br>
+                            سبب الخروج: <strong>${exitReason || 'غير محدد'}</strong><br>
+                            نرجو الموافقة على طلب الخروج مع التأكيد على العودة في الوقت المحدد.
                         </p>
                     `;
                     break;
@@ -1216,14 +1282,6 @@
         }
 
         function saveSettings() {
-            const settings = {
-                schoolName: document.getElementById('schoolName').value,
-                schoolNameEn: document.getElementById('schoolNameEn').value,
-                schoolPhone: document.getElementById('schoolPhone').value,
-                schoolEmail: document.getElementById('schoolEmail').value,
-                schoolAddress: document.getElementById('schoolAddress').value
-            };
-            
             showNotification('تم حفظ الإعدادات بنجاح', 'success');
         }
 
@@ -1331,7 +1389,7 @@
                 employeeId: document.getElementById('employeeId').value,
                 jobTitle: document.getElementById('jobTitle').value,
                 employeePhone: document.getElementById('employeePhone').value,
-                employeeEmail: document.getElementById('employeeEmail').value
+                department: document.getElementById('department').value
             };
 
             const templates = JSON.parse(localStorage.getItem('formTemplates') || '[]');
@@ -1352,7 +1410,7 @@
                 document.getElementById('employeeId').value = '';
                 document.getElementById('jobTitle').value = '';
                 document.getElementById('employeePhone').value = '';
-                document.getElementById('employeeEmail').value = '';
+                document.getElementById('department').value = '';
                 document.getElementById('formDate').value = '';
                 
                 document.getElementById('additionalFields').innerHTML = '';
@@ -1374,7 +1432,7 @@
             document.getElementById('employeeId').value = '1234567890';
             document.getElementById('jobTitle').value = 'معلم/ة';
             document.getElementById('employeePhone').value = '+971 50 123 4567';
-            document.getElementById('employeeEmail').value = 'ahmed@example.com';
+            document.getElementById('department').value = 'قسم التدريس';
             
             generateForm();
             showNotification('تم توليد النموذج بنجاح', 'success');
@@ -1392,6 +1450,8 @@
                     <div><strong>التصفية:</strong> استخدم قائمة الفئات لتصفية النماذج</div>
                     <div><strong>الإعدادات:</strong> يمكنك تعديل بيانات المدرسة من لوحة الإعدادات</div>
                     <div><strong>تغيير الشعار:</strong> لتغيير شعار المدرسة، قم بتحديث متغير --school-logo-image في CSS بـ URL الصورة الجديدة</div>
+                    <div class="text-green-600"><strong>جديد:</strong> تم إزالة حقل الإيميل وتحديث تاريخ الميلاد ليكون تاريخ الإجراء</div>
+                    <div class="text-blue-600"><strong>محدث:</strong> يتم الآن عرض جميع البيانات المدخلة في النموذج المولد</div>
                 </div>
             `);
         }
