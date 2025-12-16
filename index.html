@@ -42,6 +42,48 @@
             to { transform: translateY(0); opacity: 1; }
         }
         
+        /* Form input styles for empty forms */
+        .editable-field {
+            border-bottom: 2px solid #3b82f6;
+            min-height: 24px;
+            padding: 4px 8px;
+            margin: 0 8px;
+            display: inline-block;
+            min-width: 150px;
+            background: rgba(59, 130, 246, 0.05);
+            border-radius: 4px;
+            outline: none;
+            font-weight: normal;
+        }
+        
+        .editable-field:focus {
+            background: rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+        
+        .editable-field:empty:before {
+            content: attr(data-placeholder);
+            color: #9ca3af;
+            font-style: italic;
+        }
+        
+        .editable-textarea {
+            border: 2px solid #3b82f6;
+            min-height: 80px;
+            padding: 8px;
+            margin: 8px 0;
+            width: 100%;
+            background: rgba(59, 130, 246, 0.05);
+            border-radius: 8px;
+            outline: none;
+            resize: vertical;
+        }
+        
+        .editable-textarea:focus {
+            background: rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+        
         @media print {
             body * { visibility: hidden; }
             #printArea, #printArea * { visibility: visible; }
@@ -141,6 +183,13 @@
             }
             .form-footer .grid {
                 gap: 15px !important;
+            }
+            /* Print styles for editable fields */
+            .editable-field,
+            .editable-textarea {
+                border: 1px solid #000 !important;
+                background: white !important;
+                box-shadow: none !important;
             }
         }
         
@@ -368,6 +417,31 @@
             -webkit-print-color-adjust: exact !important;
             color-adjust: exact !important;
             print-color-adjust: exact !important;
+        }
+
+        /* Badge for form type */
+        .form-type-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .generation-type-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
         }
     </style>
 </head>
@@ -673,6 +747,42 @@
                     <!-- Additional Fields -->
                     <div id="additionalFields"></div>
 
+                    <!-- Generation Type Selection -->
+                    <div class="form-section p-6 rounded-lg mb-6">
+                        <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4">
+                            <i class="fas fa-cog text-primary mr-2"></i>
+                            نوع التوليد
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors generation-option">
+                                <input type="radio" name="generationType" value="filled" checked class="text-primary focus:ring-primary mr-3">
+                                <div>
+                                    <div class="font-bold text-gray-800 dark:text-white">نموذج مملوء</div>
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">توليد النموذج مع البيانات المدخلة</div>
+                                </div>
+                            </label>
+                            <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors generation-option">
+                                <input type="radio" name="generationType" value="empty" class="text-primary focus:ring-primary mr-3">
+                                <div>
+                                    <div class="font-bold text-gray-800 dark:text-white">نموذج فارغ</div>
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">توليد نموذج فارغ قابل للتحرير</div>
+                                </div>
+                            </label>
+                        </div>
+                        <div id="emptyFormNote" class="hidden bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-info-circle text-blue-400"></i>
+                                </div>
+                                <div class="mr-3">
+                                    <p class="text-sm text-blue-700">
+                                        <strong>ملاحظة:</strong> سيتم توليد النموذج بحقول فارغة قابلة للتحرير ليقوم الموظف بملئها لاحقاً.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Action Buttons -->
                     <div class="flex flex-wrap gap-4 justify-center">
                         <button onclick="generateForm()" class="bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-3 rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-lg transform hover:scale-105">
@@ -729,8 +839,12 @@
                             <div class="school-logo"></div>
                         </div>
 
-                        <!-- Form Title -->
+                        <!-- Form Title with Type Badge -->
                         <div class="text-center">
+                            <div class="mb-2">
+                                <span id="formTypeBadge" class="form-type-badge">نوع النموذج</span>
+                                <span id="generationTypeBadge" class="generation-type-badge">نموذج مملوء</span>
+                            </div>
                             <h2 id="formTitle" class="text-xl font-bold text-white border-4 border-white inline-block px-6 py-2 rounded-lg bg-blue-600"></h2>
                             <p class="text-xs text-blue-100 mt-1">نموذج رقم: #<span id="formNumber">2024001</span></p>
                         </div>
@@ -841,6 +955,9 @@
             // Set current date
             document.getElementById('formDate').value = new Date().toISOString().split('T')[0];
             
+            // Setup generation type change handler
+            setupGenerationTypeHandler();
+            
             // Smooth scroll to form fields
             setTimeout(() => {
                 document.getElementById('formFields').scrollIntoView({ 
@@ -848,6 +965,33 @@
                     block: 'start'
                 });
             }, 100);
+        }
+        
+        function setupGenerationTypeHandler() {
+            const radioButtons = document.querySelectorAll('input[name="generationType"]');
+            const emptyFormNote = document.getElementById('emptyFormNote');
+            const generationOptions = document.querySelectorAll('.generation-option');
+            
+            radioButtons.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    // Update visual selection
+                    generationOptions.forEach(option => {
+                        option.classList.remove('border-primary', 'bg-blue-50');
+                        option.classList.add('border-gray-200');
+                    });
+                    
+                    const selectedOption = this.closest('.generation-option');
+                    selectedOption.classList.remove('border-gray-200');
+                    selectedOption.classList.add('border-primary', 'bg-blue-50');
+                    
+                    // Show/hide note for empty forms
+                    if (this.value === 'empty') {
+                        emptyFormNote.classList.remove('hidden');
+                    } else {
+                        emptyFormNote.classList.add('hidden');
+                    }
+                });
+            });
         }
         
         function updateFieldLabels(type) {
@@ -1039,13 +1183,15 @@
         function generateForm() {
             if (!selectedFormType) return;
             
+            const generationType = document.querySelector('input[name="generationType"]:checked').value;
             const employeeName = document.getElementById('employeeName').value;
             const employeeId = document.getElementById('employeeId').value;
             const jobTitle = document.getElementById('jobTitle').value;
             const formDate = document.getElementById('formDate').value;
             
-            if (!employeeName || !employeeId || !jobTitle || !formDate) {
-                showCustomAlert('يرجى ملء جميع البيانات المطلوبة');
+            // For filled forms, validate required fields
+            if (generationType === 'filled' && (!employeeName || !employeeId || !jobTitle || !formDate)) {
+                showCustomAlert('يرجى ملء جميع البيانات المطلوبة للنموذج المملوء');
                 return;
             }
             
@@ -1062,11 +1208,37 @@
                 'violation': 'نموذج مخالفة'
             };
             
+            const formCategories = {
+                'work-start': 'الموارد البشرية',
+                'vacation': 'الموارد البشرية',
+                'termination': 'الموارد البشرية',
+                'resignation': 'الموارد البشرية',
+                'exit-permission': 'النماذج الإدارية',
+                'custody-receive': 'نماذج العهد',
+                'custody-handover': 'نماذج العهد',
+                'no-transport': 'النماذج الإدارية',
+                'warning': 'النماذج التأديبية',
+                'violation': 'النماذج التأديبية'
+            };
+            
             // Update header with settings data
             document.getElementById('headerSchoolName').textContent = document.getElementById('schoolName').value;
             document.getElementById('headerSchoolNameEn').textContent = document.getElementById('schoolNameEn').value;
             document.getElementById('headerSchoolPhone').textContent = document.getElementById('schoolPhone').value;
             document.getElementById('headerSchoolAddress').textContent = document.getElementById('schoolAddress').value;
+            
+            // Update form type badge
+            document.getElementById('formTypeBadge').textContent = formCategories[selectedFormType] || 'نوع النموذج';
+            
+            // Update generation type badge
+            const generationTypeBadge = document.getElementById('generationTypeBadge');
+            if (generationType === 'empty') {
+                generationTypeBadge.textContent = 'نموذج فارغ';
+                generationTypeBadge.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+            } else {
+                generationTypeBadge.textContent = 'نموذج مملوء';
+                generationTypeBadge.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+            }
             
             // Update display labels based on form type
             if (selectedFormType === 'no-transport') {
@@ -1079,6 +1251,46 @@
             
             // Fill form header data
             document.getElementById('formTitle').textContent = formTitles[selectedFormType];
+            
+            if (generationType === 'empty') {
+                // Generate empty form with editable fields
+                generateEmptyForm();
+            } else {
+                // Generate filled form
+                generateFilledForm(employeeName, employeeId, jobTitle, formDate);
+            }
+            
+            // Generate form number and reference
+            const formNumber = '2025' + Math.random().toString().substr(2, 6);
+            const referenceNumber = selectedFormType.toUpperCase() + '-' + Math.random().toString().substr(2, 4);
+            document.getElementById('formNumber').textContent = formNumber;
+            document.getElementById('referenceNumber').textContent = referenceNumber;
+            document.getElementById('creationDate').textContent = new Date().toLocaleDateString('en-GB') + ' ' + new Date().toLocaleTimeString('en-GB');
+            
+            document.getElementById('printArea').classList.remove('hidden');
+            
+            // Scroll to generated form
+            document.getElementById('printArea').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function generateEmptyForm() {
+            // Create editable fields for basic info
+            document.getElementById('displayEmployeeName').innerHTML = `<span class="editable-field" contenteditable="true" data-placeholder="أدخل الاسم الكامل"></span>`;
+            document.getElementById('displayEmployeeId').innerHTML = `<span class="editable-field" contenteditable="true" data-placeholder="رقم الهوية"></span>`;
+            document.getElementById('displayJobTitle').innerHTML = `<span class="editable-field" contenteditable="true" data-placeholder="المسمى الوظيفي"></span>`;
+            document.getElementById('displayFormDate').innerHTML = `<span class="editable-field" contenteditable="true" data-placeholder="التاريخ"></span>`;
+            document.getElementById('displayEmployeePhone').innerHTML = `<span class="editable-field" contenteditable="true" data-placeholder="رقم الهاتف"></span>`;
+            document.getElementById('displayDepartment').innerHTML = `<span class="editable-field" contenteditable="true" data-placeholder="القسم/الإدارة"></span>`;
+            
+            // Generate empty content based on form type
+            let content = generateEmptyFormContent(selectedFormType);
+            document.getElementById('formContent').innerHTML = content;
+            
+            // Clear additional data
+            document.getElementById('allFormData').innerHTML = '<strong>نموذج فارغ - يرجى ملء البيانات المطلوبة</strong>';
+        }
+        
+        function generateFilledForm(employeeName, employeeId, jobTitle, formDate) {
             document.getElementById('displayEmployeeName').textContent = employeeName;
             document.getElementById('displayEmployeeId').textContent = employeeId;
             document.getElementById('displayJobTitle').textContent = jobTitle;
@@ -1090,22 +1302,113 @@
             const allData = collectAllFormData();
             document.getElementById('allFormData').innerHTML = '<strong>جميع البيانات المدخلة:</strong><br>' + allData;
             
-            // Generate form number and reference
-            const formNumber = '2025' + Math.random().toString().substr(2, 6);
-            const referenceNumber = selectedFormType.toUpperCase() + '-' + Math.random().toString().substr(2, 4);
-            document.getElementById('formNumber').textContent = formNumber;
-            document.getElementById('referenceNumber').textContent = referenceNumber;
-            document.getElementById('creationDate').textContent = new Date().toLocaleDateString('en-GB') + ' ' + new Date().toLocaleTimeString('en-GB');
-            
             let content = generateFormContent(selectedFormType, {
                 employeeName, employeeId, jobTitle, formDate
             });
             
             document.getElementById('formContent').innerHTML = content;
-            document.getElementById('printArea').classList.remove('hidden');
+        }
+        
+        function generateEmptyFormContent(type) {
+            const personLabel = type === 'no-transport' ? 'ولي الأمر' : 'الموظف/ة';
+            let content = '';
             
-            // Scroll to generated form
-            document.getElementById('printArea').scrollIntoView({ behavior: 'smooth' });
+            switch(type) {
+                case 'work-start':
+                    content = `
+                        <p class="text-sm leading-relaxed mb-4">
+                            نعلمكم أنه تم مباشرة ${personLabel} 
+                            <span class="editable-field" contenteditable="true" data-placeholder="اسم الموظف"></span>
+                            للعمل بمدرسة الثروات الوطنية الخاصة اعتباراً من تاريخ 
+                            <span class="editable-field" contenteditable="true" data-placeholder="تاريخ المباشرة"></span>
+                            في منصب 
+                            <span class="editable-field" contenteditable="true" data-placeholder="المسمى الوظيفي"></span>
+                            .<br>
+                            نرجو الالتزام بالأنظمة واللوائح المدرسية والتقيد بمواعيد العمل المحددة والمحافظة على سرية المعلومات.
+                        </p>
+                        <div class="mt-4">
+                            <strong>ملاحظات إضافية:</strong>
+                            <textarea class="editable-textarea" placeholder="أضف أي ملاحظات أو تعليمات إضافية"></textarea>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'vacation':
+                    content = `
+                        <p class="text-sm leading-relaxed mb-4">
+                            نعلمكم أنه تم طلب إجازة من ${personLabel} 
+                            <span class="editable-field" contenteditable="true" data-placeholder="اسم الموظف"></span>
+                            من تاريخ 
+                            <span class="editable-field" contenteditable="true" data-placeholder="تاريخ البداية"></span>
+                            إلى تاريخ 
+                            <span class="editable-field" contenteditable="true" data-placeholder="تاريخ النهاية"></span>
+                            .<br>
+                            نوع الإجازة: 
+                            <span class="editable-field" contenteditable="true" data-placeholder="نوع الإجازة"></span>
+                            <br>
+                            سبب الإجازة: 
+                            <span class="editable-field" contenteditable="true" data-placeholder="سبب الإجازة"></span>
+                        </p>
+                        <div class="mt-4">
+                            <strong>تفاصيل إضافية:</strong>
+                            <textarea class="editable-textarea" placeholder="أضف تفاصيل إضافية حول الإجازة"></textarea>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'termination':
+                    content = `
+                        <p class="text-sm leading-relaxed mb-4">
+                            نعلمكم أنه تم إنهاء خدمات ${personLabel} 
+                            <span class="editable-field" contenteditable="true" data-placeholder="اسم الموظف"></span>
+                            من مدرسة الثروات الوطنية الخاصة اعتباراً من تاريخ 
+                            <span class="editable-field" contenteditable="true" data-placeholder="تاريخ الإنهاء"></span>
+                            .<br>
+                            تم تسوية جميع المستحقات المالية واستلام العهد والممتلكات المدرسية وتسليم شهادة الخبرة وإلغاء جميع الصلاحيات.
+                        </p>
+                        <div class="mt-4">
+                            <strong>سبب الإنهاء:</strong>
+                            <textarea class="editable-textarea" placeholder="اذكر سبب إنهاء الخدمات"></textarea>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'exit-permission':
+                    content = `
+                        <p class="text-sm leading-relaxed mb-4">
+                            نعلمكم أنه تم طلب إذن خروج أثناء العمل للموظف/ة 
+                            <span class="editable-field" contenteditable="true" data-placeholder="اسم الموظف"></span>
+                            في تاريخ 
+                            <span class="editable-field" contenteditable="true" data-placeholder="التاريخ"></span>
+                            من الساعة 
+                            <span class="editable-field" contenteditable="true" data-placeholder="وقت الخروج"></span>
+                            إلى الساعة 
+                            <span class="editable-field" contenteditable="true" data-placeholder="وقت العودة"></span>
+                            .<br>
+                            الوجهة: 
+                            <span class="editable-field" contenteditable="true" data-placeholder="الوجهة"></span>
+                        </p>
+                        <div class="mt-4">
+                            <strong>سبب الخروج:</strong>
+                            <textarea class="editable-textarea" placeholder="اذكر السبب التفصيلي للخروج"></textarea>
+                        </div>
+                    `;
+                    break;
+                    
+                default:
+                    content = `
+                        <p class="text-sm leading-relaxed mb-4">
+                            نعلمكم أنه 
+                            <span class="editable-field" contenteditable="true" data-placeholder="تفاصيل الإجراء"></span>
+                        </p>
+                        <div class="mt-4">
+                            <strong>التفاصيل:</strong>
+                            <textarea class="editable-textarea" placeholder="أضف التفاصيل الكاملة للنموذج"></textarea>
+                        </div>
+                    `;
+            }
+            
+            return content;
         }
         
         function collectAllFormData() {
@@ -1492,14 +1795,18 @@
                 <div class="text-sm space-y-3">
                     <div><strong>1. اختيار النموذج:</strong> انقر على أي نموذج من النماذج المتاحة</div>
                     <div><strong>2. ملء البيانات:</strong> أدخل بيانات الموظف والتفاصيل المطلوبة</div>
-                    <div><strong>3. توليد النموذج:</strong> انقر على "توليد النموذج" لإنشاء النموذج</div>
-                    <div><strong>4. الطباعة:</strong> استخدم زر "طباعة" أو "تحميل PDF"</div>
+                    <div><strong>3. اختيار نوع التوليد:</strong> 
+                        <br>- نموذج مملوء: سيحتوي على البيانات المدخلة
+                        <br>- نموذج فارغ: سيحتوي على حقول قابلة للتحرير
+                    </div>
+                    <div><strong>4. توليد النموذج:</strong> انقر على "توليد النموذج" لإنشاء النموذج</div>
+                    <div><strong>5. الطباعة:</strong> استخدم زر "طباعة" أو "تحميل PDF"</div>
+                    <div class="bg-blue-50 p-3 rounded">
+                        <strong class="text-blue-700">جديد:</strong> يمكن الآن توليد نماذج فارغة قابلة للتحرير ليقوم الموظف بملئها بنفسه
+                    </div>
                     <div><strong>البحث:</strong> يمكنك البحث في النماذج باستخدام مربع البحث</div>
                     <div><strong>التصفية:</strong> استخدم قائمة الفئات لتصفية النماذج</div>
                     <div><strong>الإعدادات:</strong> يمكنك تعديل بيانات المدرسة من لوحة الإعدادات</div>
-                    <div><strong>تغيير الشعار:</strong> لتغيير شعار المدرسة، قم بتحديث متغير --school-logo-image في CSS بـ URL الصورة الجديدة</div>
-                    <div class="text-green-600"><strong>جديد:</strong> تم إزالة حقل الإيميل وتحديث تاريخ الميلاد ليكون تاريخ الإجراء</div>
-                    <div class="text-blue-600"><strong>محدث:</strong> يتم الآن عرض جميع البيانات المدخلة في النموذج المولد</div>
                 </div>
             `);
         }
@@ -1600,7 +1907,7 @@
                             <button class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors" onclick="this.closest('.fixed').remove()">
                                 إلغاء
                             </button>
-                            <button class="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 transition-colors" onclick="this.closest('.fixed').remove(); onConfirm();">
+                            <button class="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 transition-colors" onclick="this.closest('.fixed').remove(); (${onConfirm})();">
                                 تأكيد
                             </button>
                         </div>
