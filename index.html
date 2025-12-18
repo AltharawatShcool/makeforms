@@ -1233,9 +1233,9 @@
             // Update generation type badge
             const generationTypeBadge = document.getElementById('generationTypeBadge');
             if (generationType === 'empty') {
-                generationTypeBadge.textContent = 'نموذج فارغ';
-                generationTypeBadge.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+                generationTypeBadge.style.display = 'none';
             } else {
+                generationTypeBadge.style.display = 'inline-block';
                 generationTypeBadge.textContent = 'نموذج مملوء';
                 generationTypeBadge.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
             }
@@ -1274,13 +1274,13 @@
         }
         
         function generateEmptyForm() {
-            // Create editable fields for basic info
-            document.getElementById('displayEmployeeName').innerHTML = `<span class="editable-field" contenteditable="true" data-placeholder="أدخل الاسم الكامل"></span>`;
-            document.getElementById('displayEmployeeId').innerHTML = `<span class="editable-field" contenteditable="true" data-placeholder="رقم الهوية"></span>`;
-            document.getElementById('displayJobTitle').innerHTML = `<span class="editable-field" contenteditable="true" data-placeholder="المسمى الوظيفي"></span>`;
-            document.getElementById('displayFormDate').innerHTML = `<span class="editable-field" contenteditable="true" data-placeholder="التاريخ"></span>`;
-            document.getElementById('displayEmployeePhone').innerHTML = `<span class="editable-field" contenteditable="true" data-placeholder="رقم الهاتف"></span>`;
-            document.getElementById('displayDepartment').innerHTML = `<span class="editable-field" contenteditable="true" data-placeholder="القسم/الإدارة"></span>`;
+            // Create editable fields for basic info without placeholders
+            document.getElementById('displayEmployeeName').innerHTML = `<span class="editable-field" contenteditable="true"></span>`;
+            document.getElementById('displayEmployeeId').innerHTML = `<span class="editable-field" contenteditable="true"></span>`;
+            document.getElementById('displayJobTitle').innerHTML = `<span class="editable-field" contenteditable="true"></span>`;
+            document.getElementById('displayFormDate').innerHTML = `<span class="editable-field" contenteditable="true"></span>`;
+            document.getElementById('displayEmployeePhone').innerHTML = `<span class="editable-field" contenteditable="true"></span>`;
+            document.getElementById('displayDepartment').innerHTML = `<span class="editable-field" contenteditable="true"></span>`;
             
             // Generate empty content based on form type
             let content = generateEmptyFormContent(selectedFormType);
@@ -1318,17 +1318,17 @@
                     content = `
                         <p class="text-sm leading-relaxed mb-4">
                             نعلمكم أنه تم مباشرة ${personLabel} 
-                            <span class="editable-field" contenteditable="true" data-placeholder="اسم الموظف"></span>
+                            <span class="editable-field" contenteditable="true"></span>
                             للعمل بمدرسة الثروات الوطنية الخاصة اعتباراً من تاريخ 
-                            <span class="editable-field" contenteditable="true" data-placeholder="تاريخ المباشرة"></span>
+                            <span class="editable-field" contenteditable="true"></span>
                             في منصب 
-                            <span class="editable-field" contenteditable="true" data-placeholder="المسمى الوظيفي"></span>
+                            <span class="editable-field" contenteditable="true"></span>
                             .<br>
                             نرجو الالتزام بالأنظمة واللوائح المدرسية والتقيد بمواعيد العمل المحددة والمحافظة على سرية المعلومات.
                         </p>
                         <div class="mt-4">
                             <strong>ملاحظات إضافية:</strong>
-                            <textarea class="editable-textarea" placeholder="أضف أي ملاحظات أو تعليمات إضافية"></textarea>
+                            <textarea class="editable-textarea"></textarea>
                         </div>
                     `;
                     break;
@@ -1337,21 +1337,21 @@
                     content = `
                         <p class="text-sm leading-relaxed mb-4">
                             نعلمكم أنه تم طلب إجازة من ${personLabel} 
-                            <span class="editable-field" contenteditable="true" data-placeholder="اسم الموظف"></span>
+                            <span class="editable-field" contenteditable="true"></span>
                             من تاريخ 
-                            <span class="editable-field" contenteditable="true" data-placeholder="تاريخ البداية"></span>
+                            <span class="editable-field" contenteditable="true"></span>
                             إلى تاريخ 
-                            <span class="editable-field" contenteditable="true" data-placeholder="تاريخ النهاية"></span>
+                            <span class="editable-field" contenteditable="true"></span>
                             .<br>
                             نوع الإجازة: 
-                            <span class="editable-field" contenteditable="true" data-placeholder="نوع الإجازة"></span>
+                            <span class="editable-field" contenteditable="true"></span>
                             <br>
                             سبب الإجازة: 
-                            <span class="editable-field" contenteditable="true" data-placeholder="سبب الإجازة"></span>
+                            <span class="editable-field" contenteditable="true"></span>
                         </p>
                         <div class="mt-4">
                             <strong>تفاصيل إضافية:</strong>
-                            <textarea class="editable-textarea" placeholder="أضف تفاصيل إضافية حول الإجازة"></textarea>
+                            <textarea class="editable-textarea"></textarea>
                         </div>
                     `;
                     break;
@@ -1360,15 +1360,15 @@
                     content = `
                         <p class="text-sm leading-relaxed mb-4">
                             نعلمكم أنه تم إنهاء خدمات ${personLabel} 
-                            <span class="editable-field" contenteditable="true" data-placeholder="اسم الموظف"></span>
+                            <span class="editable-field" contenteditable="true"></span>
                             من مدرسة الثروات الوطنية الخاصة اعتباراً من تاريخ 
-                            <span class="editable-field" contenteditable="true" data-placeholder="تاريخ الإنهاء"></span>
+                            <span class="editable-field" contenteditable="true"></span>
                             .<br>
                             تم تسوية جميع المستحقات المالية واستلام العهد والممتلكات المدرسية وتسليم شهادة الخبرة وإلغاء جميع الصلاحيات.
                         </p>
                         <div class="mt-4">
                             <strong>سبب الإنهاء:</strong>
-                            <textarea class="editable-textarea" placeholder="اذكر سبب إنهاء الخدمات"></textarea>
+                            <textarea class="editable-textarea"></textarea>
                         </div>
                     `;
                     break;
@@ -1377,20 +1377,20 @@
                     content = `
                         <p class="text-sm leading-relaxed mb-4">
                             نعلمكم أنه تم طلب إذن خروج أثناء العمل للموظف/ة 
-                            <span class="editable-field" contenteditable="true" data-placeholder="اسم الموظف"></span>
+                            <span class="editable-field" contenteditable="true"></span>
                             في تاريخ 
-                            <span class="editable-field" contenteditable="true" data-placeholder="التاريخ"></span>
+                            <span class="editable-field" contenteditable="true"></span>
                             من الساعة 
-                            <span class="editable-field" contenteditable="true" data-placeholder="وقت الخروج"></span>
+                            <span class="editable-field" contenteditable="true"></span>
                             إلى الساعة 
-                            <span class="editable-field" contenteditable="true" data-placeholder="وقت العودة"></span>
+                            <span class="editable-field" contenteditable="true"></span>
                             .<br>
                             الوجهة: 
-                            <span class="editable-field" contenteditable="true" data-placeholder="الوجهة"></span>
+                            <span class="editable-field" contenteditable="true"></span>
                         </p>
                         <div class="mt-4">
                             <strong>سبب الخروج:</strong>
-                            <textarea class="editable-textarea" placeholder="اذكر السبب التفصيلي للخروج"></textarea>
+                            <textarea class="editable-textarea"></textarea>
                         </div>
                     `;
                     break;
@@ -1399,11 +1399,11 @@
                     content = `
                         <p class="text-sm leading-relaxed mb-4">
                             نعلمكم أنه 
-                            <span class="editable-field" contenteditable="true" data-placeholder="تفاصيل الإجراء"></span>
+                            <span class="editable-field" contenteditable="true"></span>
                         </p>
                         <div class="mt-4">
                             <strong>التفاصيل:</strong>
-                            <textarea class="editable-textarea" placeholder="أضف التفاصيل الكاملة للنموذج"></textarea>
+                            <textarea class="editable-textarea"></textarea>
                         </div>
                     `;
             }
