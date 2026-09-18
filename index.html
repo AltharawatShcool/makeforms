@@ -3,1944 +3,1001 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مولد النماذج المدرسية المتقدم - مدرسة الثروات الوطنية الخاصة</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#5D5CDE',
-                        secondary: '#f8f9fa',
-                        accent: '#10B981',
-                        warning: '#F59E0B',
-                        danger: '#EF4444'
-                    },
-                    fontFamily: {
-                        arabic: ['Segoe UI', 'Tahoma', 'Arial', 'sans-serif']
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.5s ease-in-out',
-                        'slide-up': 'slideUp 0.3s ease-out',
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-                    }
-                }
-            }
-        }
-    </script>
+    <title>نظام إدارة الوثائق والمراسلات الرسمية | مدرسة الثروات الوطنية</title>
+    
+    <!-- Google Fonts: Cairo & Tajawal -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome 6 Pro-like Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- PDF & QR Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
     <style>
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        :root {
+            --primary: #0f2744;
+            --primary-accent: #1e3a8a;
+            --gold: #b45309;
+            --gold-light: #fef3c7;
+            --sidebar-bg: #0b1329;
+            --sidebar-card: #152243;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --success: #059669;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --font-display: 'Cairo', sans-serif;
+            --font-body: 'Tajawal', sans-serif;
         }
-        
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-body);
+            background-color: #e2e8f0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
         }
-        
-        /* Form input styles for empty forms */
-        .editable-field {
-            border-bottom: 2px solid #3b82f6;
-            min-height: 24px;
-            padding: 4px 8px;
-            margin: 0 8px;
-            display: inline-block;
-            min-width: 150px;
-            background: rgba(59, 130, 246, 0.05);
-            border-radius: 4px;
-            outline: none;
-            font-weight: normal;
+
+        /* --- شريط التمرير --- */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+
+        /* --- القائمة الجانبية المتقدمة --- */
+        .sidebar {
+            width: 400px;
+            background: var(--sidebar-bg);
+            color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid rgba(255,255,255,0.1);
+            z-index: 100;
+            box-shadow: 5px 0 25px rgba(0,0,0,0.25);
+            transition: transform 0.3s ease;
         }
-        
-        .editable-field:focus {
-            background: rgba(59, 130, 246, 0.1);
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+
+        .sidebar-brand {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.06), transparent);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
         }
-        
-        .editable-field:empty:before {
-            content: attr(data-placeholder);
-            color: #9ca3af;
-            font-style: italic;
-        }
-        
-        .editable-textarea {
-            border: 2px solid #3b82f6;
-            min-height: 80px;
-            padding: 8px;
-            margin: 8px 0;
-            width: 100%;
-            background: rgba(59, 130, 246, 0.05);
-            border-radius: 8px;
-            outline: none;
-            resize: vertical;
-        }
-        
-        .editable-textarea:focus {
-            background: rgba(59, 130, 246, 0.1);
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-        }
-        
-        @media print {
-            body * { visibility: hidden; }
-            #printArea, #printArea * { visibility: visible; }
-            #printArea { 
-                position: absolute; 
-                left: 0; 
-                top: 0; 
-                width: 100%; 
-                margin: 0;
-                padding: 0;
-            }
-            .no-print { display: none !important; }
-            .print-only { display: block !important; }
-            .form-border {
-                height: 297mm !important;
-                max-height: 297mm !important;
-                width: 210mm;
-                margin: 0;
-                padding: 10mm !important;
-                page-break-inside: avoid;
-                box-sizing: border-box;
-                overflow: hidden;
-                display: flex;
-                flex-direction: column;
-            }
-            .form-header {
-                padding-bottom: 8px !important;
-                margin-bottom: 10px !important;
-                border-bottom: 2px solid #2563eb !important;
-                background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
-                -webkit-print-color-adjust: exact !important;
-                color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            .professional-header {
-                background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
-                -webkit-print-color-adjust: exact !important;
-                color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            .form-header h1 {
-                font-size: 20px !important;
-                margin-bottom: 8px !important;
-            }
-            .form-header h2 {
-                font-size: 14px !important;
-                margin-bottom: 5px !important;
-            }
-            .form-header .text-sm {
-                font-size: 10px !important;
-            }
-            .school-logo {
-                width: 60px !important;
-                height: 60px !important;
-                font-size: 16px !important;
-            }
-            .info-grid {
-                padding: 10px !important;
-                gap: 8px !important;
-                margin-bottom: 15px !important;
-            }
-            .info-item {
-                padding: 4px 0 !important;
-                font-size: 12px !important;
-            }
-            .form-content-section {
-                flex: 1;
-                padding: 15px !important;
-                margin: 8px 0 !important;
-                min-height: auto !important;
-                overflow: hidden;
-            }
-            .form-content-section h3 {
-                font-size: 16px !important;
-                margin-bottom: 10px !important;
-                padding-bottom: 5px !important;
-            }
-            .form-content-section .text-lg {
-                font-size: 12px !important;
-                line-height: 1.4 !important;
-            }
-            .form-footer {
-                padding-top: 10px !important;
-                margin-top: 10px !important;
-                border-top: 2px solid #2563eb !important;
-            }
-            .signature-box {
-                height: 40px !important;
-                margin-bottom: 8px !important;
-            }
-            .form-footer .text-sm,
-            .form-footer .text-xs {
-                font-size: 8px !important;
-            }
-            .form-footer p {
-                margin-bottom: 5px !important;
-            }
-            .form-footer .grid {
-                gap: 15px !important;
-            }
-            /* Print styles for editable fields */
-            .editable-field,
-            .editable-textarea {
-                border: 1px solid #000 !important;
-                background: white !important;
-                box-shadow: none !important;
-            }
-        }
-        
-        /* شعار المدرسة الاحترافي */
-        .school-logo {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 28px;
-            box-shadow: 0 8px 32px rgba(93, 92, 222, 0.3);
-            border: 4px solid white;
-            background-image: var(--school-logo-image);
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            font-size: 1.3rem;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+        }
+        .sidebar-brand h2 { font-family: var(--font-display); font-size: 1.15rem; font-weight: 800; color: #fff; }
+        .sidebar-brand p { font-size: 0.75rem; color: #94a3b8; }
+
+        .sidebar-content { flex: 1; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+
+        .form-card {
+            background: var(--sidebar-card);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .card-header-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #38bdf8;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 0.8rem; color: #cbd5e1; margin-bottom: 5px; font-weight: 500; }
+        .form-control {
+            width: 100%;
+            padding: 9px 12px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #f1f5f9;
+            transition: all 0.2s;
+            outline: none;
+        }
+        .form-control:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+        }
+        select.form-control { cursor: pointer; }
+        textarea.form-control { resize: vertical; min-height: 60px; line-height: 1.5; }
+
+        .file-upload-box {
+            border: 1.5px dashed #475569;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(15, 23, 42, 0.4);
             position: relative;
-            overflow: hidden;
+            transition: 0.2s;
         }
-        
-        .school-logo::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, #5D5CDE 0%, #3B82F6 50%, #10B981 100%);
-            opacity: 0.9;
-            z-index: -1;
+        .file-upload-box:hover { border-color: #38bdf8; background: rgba(56,189,248,0.05); }
+        .file-upload-box input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+        .file-upload-box span { font-size: 0.78rem; color: #94a3b8; display: block; margin-top: 4px; }
+
+        /* تذييل جهات الاتصال في القائمة الجانبية */
+        .sidebar-support {
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.3), rgba(15, 23, 42, 0.6));
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
         }
-        
-        /* لتغيير شعار المدرسة، قم بتحديث هذا المتغير بـ URL الصورة الجديدة */
-        :root {
-            --school-logo-image: url('https://www2.0zz0.com/2025/12/15/09/216505402.jpg');
+        .support-links { display: flex; gap: 8px; margin-top: 8px; }
+        .support-btn {
+            flex: 1;
+            padding: 7px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+            color: #fff;
+            font-weight: 600;
         }
+        .btn-green { background: #16a34a; }
+        .btn-navy { background: #2563eb; }
+
+        /* --- بيئة العمل Toolbar & Canvas --- */
+        .main-workspace { flex: 1; display: flex; flex-direction: column; position: relative; height: 100vh; overflow: hidden; }
+
+        .top-toolbar {
+            height: 60px;
+            background: #ffffff;
+            border-bottom: 1px solid #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+            z-index: 10;
+        }
+        .tool-btn-group { display: flex; align-items: center; gap: 8px; }
         
-        .form-border {
-            border: 6px solid #2563eb;
-            border-radius: 16px;
-            max-height: 297mm;
-            background: white;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            position: relative;
-            padding: 20mm;
-            margin: 0 auto;
+        .action-btn {
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-display);
+            transition: all 0.2s;
+        }
+        .action-btn-print { background: #0f172a; color: #fff; }
+        .action-btn-print:hover { background: #1e293b; }
+        .action-btn-pdf { background: #0284c7; color: #fff; }
+        .action-btn-pdf:hover { background: #0369a1; }
+        
+        .tool-icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            transition: 0.2s;
+        }
+        .tool-icon-btn:hover { background: #f1f5f9; color: var(--primary); }
+
+        .paper-scroll-area {
+            flex: 1;
+            overflow: auto;
+            padding: 40px 15px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .paper-scale-container {
+            transition: transform 0.2s ease-out;
+            transform-origin: top center;
+        }
+
+        /* --- تصميم ورقة A4 الرسمية الفاخرة --- */
+        .official-doc {
             width: 210mm;
-            box-sizing: border-box;
-            overflow: hidden;
+            height: 297mm;
+            min-height: 297mm;
+            background: #ffffff;
+            position: relative;
+            padding: 14mm 16mm 14mm 16mm;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
             display: flex;
             flex-direction: column;
+            color: #1e293b;
+            box-sizing: border-box;
         }
-        
-        .form-border::before {
+
+        /* الإطار الخارجي والداخلي */
+        .official-doc::after {
             content: '';
             position: absolute;
-            top: 15px;
-            right: 15px;
-            bottom: 15px;
-            left: 15px;
-            border: 3px solid #e5e7eb;
-            border-radius: 12px;
+            inset: 8mm 10mm;
+            border: 1px solid #94a3b8;
             pointer-events: none;
         }
-        
-        .signature-box {
-            border: 3px solid #d1d5db;
-            height: 100px;
-            background: linear-gradient(45deg, #f9fafb 0%, #f3f4f6 100%);
-            border-radius: 12px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .signature-box::before {
+        .official-doc::before {
             content: '';
             position: absolute;
-            bottom: 25px;
-            right: 25px;
-            left: 25px;
-            height: 2px;
-            background: linear-gradient(90deg, transparent 0%, #9ca3af 20%, #9ca3af 80%, transparent 100%);
+            inset: 9mm 11mm;
+            border: 2px solid var(--primary);
+            pointer-events: none;
         }
-        
-        .form-section {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border-left: 6px solid #5D5CDE;
-            border-radius: 8px;
-        }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        @page {
-            size: A4;
-            margin: 0;
-        }
-        
-        .floating-action {
-            position: fixed;
-            bottom: 30px;
-            left: 30px;
-            z-index: 50;
-        }
-        
-        .form-step {
-            display: none;
-        }
-        
-        .form-step.active {
-            display: block;
-            animation: fade-in 0.5s ease-in-out;
-        }
-        
-        .step-indicator {
-            transition: all 0.3s ease;
-        }
-        
-        .step-indicator.completed {
-            background: #10B981;
-            color: white;
-        }
-        
-        .step-indicator.active {
-            background: #5D5CDE;
-            color: white;
-            transform: scale(1.1);
-        }
-        
+
+        /* العلامة المائية */
         .watermark {
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 180px;
-            color: rgba(93, 92, 222, 0.05);
-            font-weight: bold;
+            transform: translate(-50%, -50%);
+            opacity: 0.035;
+            width: 450px;
             pointer-events: none;
             z-index: 1;
         }
-        
-        .form-header {
-            border-bottom: 4px solid #2563eb;
-            padding-bottom: 25px;
-            margin-bottom: 30px;
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
-            -webkit-print-color-adjust: exact !important;
-            color-adjust: exact !important;
-            print-color-adjust: exact !important;
+
+        .doc-inner { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; }
+
+        /* رأس الوثيقة (Header) - شعار موحد */
+        .doc-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #0f2744;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
         }
+        .header-col-meta { font-size: 0.82rem; line-height: 1.6; color: #475569; text-align: right; }
+        .header-col-meta span { font-weight: 700; color: #0f172a; }
         
-        .form-content-section {
-            background: linear-gradient(135deg, #fafbff 0%, #f0f3ff 100%);
-            border: 2px solid #e0e7ff;
-            border-radius: 12px;
-            padding: 25px;
-            margin: 20px 0;
-            flex: 1;
-            overflow: hidden;
+        .header-col-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
-        
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            padding: 25px;
+        .header-school-logo {
+            max-height: 75px;
+            max-width: 140px;
+            object-fit: contain;
+        }
+
+        .header-col-titles { text-align: left; direction: ltr; font-size: 0.78rem; color: #475569; line-height: 1.4; }
+        .header-col-titles h4 { font-size: 0.85rem; color: #0f172a; font-weight: 800; }
+
+        /* اسم المدرسة والعنوان الرئيسي */
+        .doc-heading-strip {
+            text-align: center;
+            margin-bottom: 14px;
+        }
+        .doc-school-title {
+            font-family: var(--font-display);
+            font-size: 1.35rem;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+        .doc-sub-title {
+            display: inline-block;
+            background: linear-gradient(135deg, #0f2744, #1e3a8a);
+            color: #ffffff;
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 700;
+            padding: 4px 28px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        /* جدول بيانات الموظف المتقن */
+        .emp-meta-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 18px;
+            font-size: 0.88rem;
             background: #f8fafc;
-            border-radius: 12px;
-            border-left: 6px solid #3b82f6;
+            border: 1px solid #cbd5e1;
         }
-        
-        .info-item {
-            padding: 12px 0;
-            border-bottom: 1px solid #e5e7eb;
+        .emp-meta-table td {
+            padding: 7px 12px;
+            border: 1px solid #cbd5e1;
         }
+        .emp-meta-table .label {
+            background: #f1f5f9;
+            color: #475569;
+            font-weight: 700;
+            width: 16%;
+        }
+        .emp-meta-table .val {
+            color: #0f172a;
+            font-weight: 600;
+            width: 34%;
+        }
+
+        /* نص ومحتوى الوثيقة */
+        .doc-core-content {
+            flex: 1;
+            font-size: 1.02rem;
+            line-height: 2;
+            color: #1e293b;
+            text-align: justify;
+            padding: 4px 4px;
+        }
+        .doc-core-content strong { color: #0f2744; font-weight: 800; }
         
-        .form-footer {
-            border-top: 4px solid #2563eb;
-            padding-top: 30px;
+        .alert-box {
+            margin: 12px 0;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 0.92rem;
+            line-height: 1.7;
+        }
+        .alert-warning-style {
+            background: #fffbeb;
+            border-right: 4px solid #f59e0b;
+            color: #92400e;
+        }
+        .alert-danger-style {
+            background: #fef2f2;
+            border-right: 4px solid #ef4444;
+            color: #991b1b;
+        }
+
+        /* منطقة التوقيع والختم المعتمد */
+        .doc-signatures-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
             margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid #e2e8f0;
+        }
+        .sig-block {
+            text-align: center;
+            width: 150px;
+        }
+        .sig-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 40px;
+        }
+        .sig-line {
+            border-bottom: 1.5px dashed #94a3b8;
+            margin-bottom: 4px;
+        }
+        .sig-name { font-size: 0.75rem; color: #64748b; }
+
+        .stamp-block {
+            width: 100px;
+            height: 100px;
+            border: 2px dashed #94a3b8;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 0.72rem;
+            margin: 0 auto;
         }
 
-        /* تحسينات التصميم الاحترافي */
-        .premium-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
-            transition: all 0.3s ease;
+        /* تذييل الصفحة وقارئ QR الإلكتروني */
+        .doc-official-footer {
+            margin-top: 14px;
+            padding-top: 8px;
+            border-top: 2px solid #0f2744;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.76rem;
+            color: #475569;
         }
-        
-        .premium-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.6);
-        }
-        
-        .form-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        .footer-qr { display: flex; align-items: center; gap: 8px; }
+        .footer-contacts { display: flex; gap: 14px; direction: ltr; }
+
+        /* Responsive Mobile */
+        .mobile-bar { display: none; }
+        @media (max-width: 1024px) {
+            body { flex-direction: column; }
+            .mobile-bar {
+                display: flex;
+                background: var(--sidebar-bg);
+                color: #fff;
+                padding: 12px 18px;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .sidebar {
+                position: fixed;
+                right: -100%;
+                top: 0;
+                bottom: 0;
+                height: 100vh;
+                transition: 0.3s;
+            }
+            .sidebar.open { right: 0; }
         }
 
-        .input-enhanced {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-            border: 2px solid #e2e8f0;
-            transition: all 0.3s ease;
-        }
-
-        .input-enhanced:focus {
-            background: white;
-            border-color: #5D5CDE;
-            box-shadow: 0 0 0 3px rgba(93, 92, 222, 0.1);
-            transform: translateY(-1px);
-        }
-
-        .professional-header {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            border-bottom: 4px solid #0ea5e9;
-            -webkit-print-color-adjust: exact !important;
-            color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
-
-        /* Badge for form type */
-        .form-type-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-        }
-
-        .generation-type-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-right: 10px;
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        /* طباعة A4 دقيقة وواضحة */
+        @page { size: A4 portrait; margin: 0; }
+        @media print {
+            body { background: #fff; overflow: visible; display: block; }
+            .sidebar, .top-toolbar, .mobile-bar { display: none !important; }
+            .main-workspace, .paper-scroll-area { padding: 0 !important; overflow: visible !important; height: auto !important; display: block !important; }
+            .paper-scale-container { transform: none !important; }
+            .official-doc {
+                box-shadow: none;
+                margin: 0;
+                padding: 12mm 15mm !important;
+                height: 297mm;
+                page-break-after: avoid;
+            }
         }
     </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 font-arabic">
-    
-    <!-- Dark mode detection -->
-    <script>
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.documentElement.classList.add('dark');
-        }
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-            if (event.matches) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-        });
-    </script>
+<body>
 
-    <div class="min-h-screen py-8">
-        <div class="max-w-4xl mx-auto px-4">
-            
-            <!-- Header -->
-            <div class="premium-card rounded-2xl p-8 mb-8 no-print text-center text-white relative overflow-hidden">
-                <div class="watermark">الثروات</div>
-                <div class="relative z-10">
-                    <div class="school-logo mx-auto mb-4 animate-pulse-slow"></div>
-                    <h1 class="text-4xl font-bold mb-2 animate-fade-in">مولد النماذج المدرسية المتقدم</h1>
-                    <p class="text-xl opacity-90 mb-4">مدرسة الثروات الوطنية الخاصة</p>
-                    <div class="flex justify-center space-x-6 text-sm opacity-80">
-                        <span><i class="fas fa-file-alt mr-2"></i>نماذج احترافية</span>
-                        <span><i class="fas fa-print mr-2"></i>طباعة فورية</span>
-                        <span><i class="fas fa-download mr-2"></i>حفظ PDF</span>
-                        <span><i class="fas fa-mobile-alt mr-2"></i>متوافق مع الجوال</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Statistics Dashboard -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 no-print">
-                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-lg border-l-4 border-primary">
-                    <div class="flex items-center">
-                        <div class="bg-primary bg-opacity-20 p-3 rounded-full">
-                            <i class="fas fa-file-alt text-primary text-xl"></i>
-                        </div>
-                        <div class="mr-4">
-                            <h3 class="text-2xl font-bold text-gray-800 dark:text-white" id="totalForms">10</h3>
-                            <p class="text-gray-600 dark:text-gray-400">إجمالي النماذج</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-lg border-l-4 border-accent">
-                    <div class="flex items-center">
-                        <div class="bg-accent bg-opacity-20 p-3 rounded-full">
-                            <i class="fas fa-users text-accent text-xl"></i>
-                        </div>
-                        <div class="mr-4">
-                            <h3 class="text-2xl font-bold text-gray-800 dark:text-white" id="employeeCount">0</h3>
-                            <p class="text-gray-600 dark:text-gray-400">الموظفين المسجلين</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-lg border-l-4 border-warning">
-                    <div class="flex items-center">
-                        <div class="bg-warning bg-opacity-20 p-3 rounded-full">
-                            <i class="fas fa-calendar text-warning text-xl"></i>
-                        </div>
-                        <div class="mr-4">
-                            <h3 class="text-2xl font-bold text-gray-800 dark:text-white" id="todayDate">--</h3>
-                            <p class="text-gray-600 dark:text-gray-400">تاريخ اليوم</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-lg border-l-4 border-danger">
-                    <div class="flex items-center">
-                        <div class="bg-danger bg-opacity-20 p-3 rounded-full">
-                            <i class="fas fa-download text-danger text-xl"></i>
-                        </div>
-                        <div class="mr-4">
-                            <h3 class="text-2xl font-bold text-gray-800 dark:text-white" id="downloadCount">0</h3>
-                            <p class="text-gray-600 dark:text-gray-400">مرات التحميل</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Settings Panel -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8 no-print">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-bold text-gray-800 dark:text-white">إعدادات المدرسة</h2>
-                    <button onclick="toggleSettings()" class="text-primary hover:text-blue-600">
-                        <i class="fas fa-cog text-xl"></i>
-                    </button>
-                </div>
-                <div id="settingsPanel" class="hidden animate-slide-up">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">اسم المدرسة</label>
-                            <input type="text" id="schoolName" value="مدرسة الثروات الوطنية الخاصة" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">الاسم الإنجليزي</label>
-                            <input type="text" id="schoolNameEn" value="AlTharawat National Private School" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">رقم الهاتف</label>
-                            <input type="text" id="schoolPhone" value="0543837551" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">العنوان</label>
-                            <input type="text" id="schoolAddress" value="الإمارات - بني شرق 9" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
-                        </div>
-                    </div>
-                    <button onclick="saveSettings()" class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
-                        <i class="fas fa-save mr-2"></i>حفظ الإعدادات
-                    </button>
-                </div>
-            </div>
-
-            <!-- Form Selection -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8 no-print">
-                <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4">
-                    <i class="fas fa-file-alt text-primary mr-2"></i>
-                    اختر نوع النموذج
-                </h2>
-                
-                <!-- Search and Filter -->
-                <div class="mb-6">
-                    <div class="flex flex-col md:flex-row gap-4">
-                        <div class="flex-1">
-                            <input type="text" id="searchForms" placeholder="البحث في النماذج..." 
-                                   class="input-enhanced w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
-                        </div>
-                        <div>
-                            <select id="categoryFilter" class="input-enhanced px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
-                                <option value="">جميع الفئات</option>
-                                <option value="hr">الموارد البشرية</option>
-                                <option value="admin">إدارية</option>
-                                <option value="disciplinary">تأديبية</option>
-                                <option value="custody">عهد</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="formButtons" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                    <button onclick="selectForm('work-start')" data-category="hr" class="form-card group p-6 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 rounded-xl border border-blue-200 dark:border-blue-700 hover:shadow-lg transition-all duration-300 text-right">
-                        <div class="flex items-center justify-between mb-3">
-                            <i class="fas fa-user-plus text-2xl text-blue-600 dark:text-blue-400"></i>
-                            <span class="text-xs bg-blue-600 text-white px-2 py-1 rounded-full">موارد بشرية</span>
-                        </div>
-                        <h3 class="font-bold text-gray-800 dark:text-white mb-2">مباشرة عمل</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">نموذج إعلام بمباشرة موظف جديد</p>
-                    </button>
-
-                    <button onclick="selectForm('vacation')" data-category="hr" class="form-card group p-6 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 rounded-xl border border-green-200 dark:border-green-700 hover:shadow-lg transition-all duration-300 text-right">
-                        <div class="flex items-center justify-between mb-3">
-                            <i class="fas fa-calendar-check text-2xl text-green-600 dark:text-green-400"></i>
-                            <span class="text-xs bg-green-600 text-white px-2 py-1 rounded-full">موارد بشرية</span>
-                        </div>
-                        <h3 class="font-bold text-gray-800 dark:text-white mb-2">طلب إجازة</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">نموذج طلب إجازة مع التواريخ والأسباب</p>
-                    </button>
-
-                    <button onclick="selectForm('termination')" data-category="hr" class="form-card group p-6 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900 dark:to-red-800 rounded-xl border border-red-200 dark:border-red-700 hover:shadow-lg transition-all duration-300 text-right">
-                        <div class="flex items-center justify-between mb-3">
-                            <i class="fas fa-user-times text-2xl text-red-600 dark:text-red-400"></i>
-                            <span class="text-xs bg-red-600 text-white px-2 py-1 rounded-full">موارد بشرية</span>
-                        </div>
-                        <h3 class="font-bold text-gray-800 dark:text-white mb-2">إنهاء خدمات</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">نموذج إعلام بإنهاء خدمات الموظف</p>
-                    </button>
-
-                    <button onclick="selectForm('resignation')" data-category="hr" class="form-card group p-6 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900 dark:to-orange-800 rounded-xl border border-orange-200 dark:border-orange-700 hover:shadow-lg transition-all duration-300 text-right">
-                        <div class="flex items-center justify-between mb-3">
-                            <i class="fas fa-sign-out-alt text-2xl text-orange-600 dark:text-orange-400"></i>
-                            <span class="text-xs bg-orange-600 text-white px-2 py-1 rounded-full">موارد بشرية</span>
-                        </div>
-                        <h3 class="font-bold text-gray-800 dark:text-white mb-2">استقالة</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">نموذج طلب استقالة من العمل</p>
-                    </button>
-
-                    <button onclick="selectForm('exit-permission')" data-category="admin" class="form-card group p-6 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900 dark:to-purple-800 rounded-xl border border-purple-200 dark:border-purple-700 hover:shadow-lg transition-all duration-300 text-right">
-                        <div class="flex items-center justify-between mb-3">
-                            <i class="fas fa-door-open text-2xl text-purple-600 dark:text-purple-400"></i>
-                            <span class="text-xs bg-purple-600 text-white px-2 py-1 rounded-full">إدارية</span>
-                        </div>
-                        <h3 class="font-bold text-gray-800 dark:text-white mb-2">إذن خروج</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">نموذج طلب إذن للخروج أثناء العمل</p>
-                    </button>
-
-                    <button onclick="selectForm('custody-receive')" data-category="custody" class="form-card group p-6 bg-gradient-to-br from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-800 rounded-xl border border-teal-200 dark:border-teal-700 hover:shadow-lg transition-all duration-300 text-right">
-                        <div class="flex items-center justify-between mb-3">
-                            <i class="fas fa-handshake text-2xl text-teal-600 dark:text-teal-400"></i>
-                            <span class="text-xs bg-teal-600 text-white px-2 py-1 rounded-full">عهد</span>
-                        </div>
-                        <h3 class="font-bold text-gray-800 dark:text-white mb-2">استلام عهدة</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">نموذج استلام العهد والمعدات</p>
-                    </button>
-
-                    <button onclick="selectForm('custody-handover')" data-category="custody" class="form-card group p-6 bg-gradient-to-br from-cyan-50 to-cyan-100 dark:from-cyan-900 dark:to-cyan-800 rounded-xl border border-cyan-200 dark:border-cyan-700 hover:shadow-lg transition-all duration-300 text-right">
-                        <div class="flex items-center justify-between mb-3">
-                            <i class="fas fa-hand-paper text-2xl text-cyan-600 dark:text-cyan-400"></i>
-                            <span class="text-xs bg-cyan-600 text-white px-2 py-1 rounded-full">عهد</span>
-                        </div>
-                        <h3 class="font-bold text-gray-800 dark:text-white mb-2">تسليم عهدة</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">نموذج تسليم العهد والمعدات</p>
-                    </button>
-
-                    <button onclick="selectForm('no-transport')" data-category="admin" class="form-card group p-6 bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900 dark:to-indigo-800 rounded-xl border border-indigo-200 dark:border-indigo-700 hover:shadow-lg transition-all duration-300 text-right">
-                        <div class="flex items-center justify-between mb-3">
-                            <i class="fas fa-bus-alt text-2xl text-indigo-600 dark:text-indigo-400"></i>
-                            <span class="text-xs bg-indigo-600 text-white px-2 py-1 rounded-full">إدارية</span>
-                        </div>
-                        <h3 class="font-bold text-gray-800 dark:text-white mb-2">عدم استخدام النقل</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">نموذج إعفاء من النقل المدرسي</p>
-                    </button>
-
-                    <button onclick="selectForm('warning')" data-category="disciplinary" class="form-card group p-6 bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900 dark:to-yellow-800 rounded-xl border border-yellow-200 dark:border-yellow-700 hover:shadow-lg transition-all duration-300 text-right">
-                        <div class="flex items-center justify-between mb-3">
-                            <i class="fas fa-exclamation-triangle text-2xl text-yellow-600 dark:text-yellow-400"></i>
-                            <span class="text-xs bg-yellow-600 text-white px-2 py-1 rounded-full">تأديبية</span>
-                        </div>
-                        <h3 class="font-bold text-gray-800 dark:text-white mb-2">إنذار</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">نموذج إنذار رسمي للموظف</p>
-                    </button>
-
-                    <button onclick="selectForm('violation')" data-category="disciplinary" class="form-card group p-6 bg-gradient-to-br from-pink-50 to-pink-100 dark:from-pink-900 dark:to-pink-800 rounded-xl border border-pink-200 dark:border-pink-700 hover:shadow-lg transition-all duration-300 text-right">
-                        <div class="flex items-center justify-between mb-3">
-                            <i class="fas fa-gavel text-2xl text-pink-600 dark:text-pink-400"></i>
-                            <span class="text-xs bg-pink-600 text-white px-2 py-1 rounded-full">تأديبية</span>
-                        </div>
-                        <h3 class="font-bold text-gray-800 dark:text-white mb-2">مخالفات</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">نموذج توثيق المخالفات</p>
-                    </button>
-                </div>
-
-                <!-- Form Fields -->
-                <div id="formFields" class="hidden animate-slide-up">
-                    <div class="form-section p-6 rounded-lg mb-6">
-                        <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4">
-                            <i class="fas fa-user text-primary mr-2"></i>
-                            البيانات الأساسية
-                        </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    <i class="fas fa-user mr-1"></i><span id="employeeNameLabel">اسم الموظف الكامل</span>
-                                </label>
-                                <input type="text" id="employeeName" placeholder="أدخل الاسم الكامل" 
-                                       class="input-enhanced w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-base transition-all">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    <i class="fas fa-id-card mr-1"></i>رقم الهوية الوطنية
-                                </label>
-                                <input type="text" id="employeeId" placeholder="1234567890" maxlength="30"
-                                       class="input-enhanced w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-base transition-all">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    <i class="fas fa-briefcase mr-1"></i>المسمى الوظيفي
-                                </label>
-                                <select id="jobTitle" class="input-enhanced w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-base transition-all">
-                                    <option value="">اختر المسمى الوظيفي</option>
-                                    <option value="معلم/ة">معلم/ة</option>
-                                    <option value="معلم أول">معلم أول</option>
-                                    <option value="مشرف تربوي">مشرف تربوي</option>
-                                    <option value="وكيل/ة">وكيل/ة</option>
-                                    <option value="مدير/ة">مدير/ة</option>
-                                    <option value="سكرتير/ة">سكرتير/ة</option>
-                                    <option value="محاسب/ة">محاسب/ة</option>
-                                    <option value="عامل نظافة">عامل نظافة</option>
-                                    <option value="حارس">حارس</option>
-                                    <option value="سائق">سائق</option>
-                                    <option value="أخرى">أخرى (يرجى التحديد في الملاحظات)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    <i class="fas fa-calendar mr-1"></i>تاريخ الإجراء (ميلادي)
-                                </label>
-                                <input type="date" id="formDate" 
-                                       class="input-enhanced w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-base transition-all">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    <i class="fas fa-phone mr-1"></i>رقم الهاتف
-                                </label>
-                                <input type="tel" id="employeePhone" placeholder="+971 50 123 4567"
-                                       class="input-enhanced w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-base transition-all">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    <i class="fas fa-building mr-1"></i>القسم/الإدارة
-                                </label>
-                                <input type="text" id="department" placeholder="قسم التدريس، الإدارة، إلخ..."
-                                       class="input-enhanced w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-base transition-all">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Additional Fields -->
-                    <div id="additionalFields"></div>
-
-                    <!-- Generation Type Selection -->
-                    <div class="form-section p-6 rounded-lg mb-6">
-                        <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4">
-                            <i class="fas fa-cog text-primary mr-2"></i>
-                            نوع التوليد
-                        </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors generation-option">
-                                <input type="radio" name="generationType" value="filled" checked class="text-primary focus:ring-primary mr-3">
-                                <div>
-                                    <div class="font-bold text-gray-800 dark:text-white">نموذج مملوء</div>
-                                    <div class="text-sm text-gray-600 dark:text-gray-400">توليد النموذج مع البيانات المدخلة</div>
-                                </div>
-                            </label>
-                            <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors generation-option">
-                                <input type="radio" name="generationType" value="empty" class="text-primary focus:ring-primary mr-3">
-                                <div>
-                                    <div class="font-bold text-gray-800 dark:text-white">نموذج فارغ</div>
-                                    <div class="text-sm text-gray-600 dark:text-gray-400">توليد نموذج فارغ قابل للتحرير</div>
-                                </div>
-                            </label>
-                        </div>
-                        <div id="emptyFormNote" class="hidden bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
-                            <div class="flex">
-                                <div class="flex-shrink-0">
-                                    <i class="fas fa-info-circle text-blue-400"></i>
-                                </div>
-                                <div class="mr-3">
-                                    <p class="text-sm text-blue-700">
-                                        <strong>ملاحظة:</strong> سيتم توليد النموذج بحقول فارغة قابلة للتحرير ليقوم الموظف بملئها لاحقاً.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="flex flex-wrap gap-4 justify-center">
-                        <button onclick="generateForm()" class="bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-3 rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-lg transform hover:scale-105">
-                            <i class="fas fa-magic mr-2"></i>توليد النموذج
-                        </button>
-                        <button onclick="printForm()" class="bg-gradient-to-r from-primary to-blue-600 text-white px-8 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg transform hover:scale-105">
-                            <i class="fas fa-print mr-2"></i>طباعة
-                        </button>
-                        <button onclick="downloadPDF()" class="bg-gradient-to-r from-red-500 to-red-600 text-white px-8 py-3 rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow-lg transform hover:scale-105">
-                            <i class="fas fa-file-pdf mr-2"></i>تحميل PDF
-                        </button>
-                        <button onclick="saveTemplate()" class="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-8 py-3 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-300 shadow-lg transform hover:scale-105">
-                            <i class="fas fa-save mr-2"></i>حفظ كقالب
-                        </button>
-                        <button onclick="clearForm()" class="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-8 py-3 rounded-lg hover:from-gray-600 hover:to-gray-700 transition-all duration-300 shadow-lg">
-                            <i class="fas fa-trash mr-2"></i>مسح البيانات
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Floating Action Buttons -->
-            <div class="floating-action no-print">
-                <div class="flex flex-col space-y-3">
-                    <button onclick="quickGenerate()" class="bg-accent text-white p-4 rounded-full shadow-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-110" title="توليد سريع">
-                        <i class="fas fa-bolt"></i>
-                    </button>
-                    <button onclick="showHelp()" class="bg-warning text-white p-4 rounded-full shadow-lg hover:bg-yellow-600 transition-all duration-300 transform hover:scale-110" title="مساعدة">
-                        <i class="fas fa-question"></i>
-                    </button>
-                    <button onclick="toggleTheme()" class="bg-gray-600 text-white p-4 rounded-full shadow-lg hover:bg-gray-700 transition-all duration-300 transform hover:scale-110" title="تغيير المظهر">
-                        <i class="fas fa-palette"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Generated Form -->
-            <div id="printArea" class="bg-white rounded-lg shadow-lg hidden">
-                <div class="form-border">
-                    <!-- Header with Logo -->
-                    <div class="form-header professional-header">
-                        <div class="flex items-center justify-between mb-4">
-                            <!-- الشعار الأيسر: صورة المدرسة -->
-                            <div class="school-logo"></div>
-                            <div class="text-center flex-1 mx-8">
-                                <h1 class="text-2xl font-bold text-white mb-2" id="headerSchoolName">مدرسة الثروات الوطنية الخاصة</h1>
-                                <h2 class="text-lg font-bold text-blue-200 mb-2" id="headerSchoolNameEn">AlTharawat National Private School</h2>
-                                <div class="text-xs text-blue-100">
-                                    <p>هاتف: <span id="headerSchoolPhone">0543837551</span></p>
-                                    <p>العنوان: <span id="headerSchoolAddress">الإمارات - بني شرق 9</span></p>
-                                </div>
-                            </div>
-                            <!-- الشعار الأيمن: نسخة مطابقة من الشعار الأيسر -->
-                            <div class="school-logo"></div>
-                        </div>
-
-                        <!-- Form Title with Type Badge -->
-                        <div class="text-center">
-                            <div class="mb-2">
-                                <span id="formTypeBadge" class="form-type-badge">نوع النموذج</span>
-                                <span id="generationTypeBadge" class="generation-type-badge">نموذج مملوء</span>
-                            </div>
-                            <h2 id="formTitle" class="text-xl font-bold text-white border-4 border-white inline-block px-6 py-2 rounded-lg bg-blue-600"></h2>
-                            <p class="text-xs text-blue-100 mt-1">نموذج رقم: #<span id="formNumber">2024001</span></p>
-                        </div>
-                    </div>
-
-                    <!-- Employee Information -->
-                    <div class="info-grid mb-4">
-                        <div class="info-item">
-                            <strong><span id="displayEmployeeNameHeader">اسم الموظف</span>:</strong>
-                            <span id="displayEmployeeName" class="mr-2">___________________</span>
-                        </div>
-                        <div class="info-item">
-                            <strong>رقم الهوية:</strong>
-                            <span id="displayEmployeeId" class="mr-2">___________________</span>
-                        </div>
-                        <div class="info-item">
-                            <strong>المسمى الوظيفي:</strong>
-                            <span id="displayJobTitle" class="mr-2">___________________</span>
-                        </div>
-                        <div class="info-item">
-                            <strong>تاريخ الإجراء:</strong>
-                            <span id="displayFormDate" class="mr-2">___________________</span>
-                        </div>
-                        <div class="info-item">
-                            <strong>رقم الهاتف:</strong>
-                            <span id="displayEmployeePhone" class="mr-2">___________________</span>
-                        </div>
-                        <div class="info-item">
-                            <strong>القسم/الإدارة:</strong>
-                            <span id="displayDepartment" class="mr-2">___________________</span>
-                        </div>
-                    </div>
-
-                    <!-- Form Content -->
-                    <div class="form-content-section">
-                        <h3 class="text-lg font-bold text-blue-800 mb-3 border-b-2 border-blue-200 pb-2">
-                            <i class="fas fa-file-text mr-2"></i>تفاصيل النموذج
-                        </h3>
-                        <div id="formContent" class="text-sm leading-relaxed">
-                            <!-- Content will be generated here -->
-                        </div>
-                        
-                        <!-- Additional Information Section -->
-                        <div class="mt-4 p-3 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-                            <h4 class="font-bold text-gray-700 mb-2 text-xs">معلومات إضافية:</h4>
-                            <div class="grid grid-cols-2 gap-3 text-xs">
-                                <p><strong>تاريخ الإنشاء:</strong> <span id="creationDate"></span></p>
-                                <p><strong>المرجع:</strong> HR-<span id="referenceNumber"></span></p>
-                                <p><strong>الحالة:</strong> <span class="text-green-600 font-semibold">معتمد</span></p>
-                                <p><strong>الأولوية:</strong> <span class="text-blue-600 font-semibold">عادية</span></p>
-                            </div>
-                            <div id="allFormData" class="mt-3 p-2 bg-blue-50 rounded text-xs"></div>
-                        </div>
-                    </div>
-
-                    <!-- Footer with Signatures -->
-                    <div class="form-footer">
-                        <div class="mb-4 text-center">
-                            <p class="text-xs text-gray-600">
-                                تم إنشاء هذا النموذج إلكترونياً بواسطة نظام إدارة الموارد البشرية - مدرسة الثروات الوطنية الخاصة
-                            </p>
-                        </div>
-                        
-                        <div class="grid grid-cols-3 gap-4">
-                            <div class="text-center">
-                                <div class="signature-box mb-2"></div>
-                                <p class="font-bold text-blue-800 text-xs"><span id="signatureLabel1">توقيع الموظف</span></p>
-                                <p class="text-xs text-gray-600">التاريخ: ___________</p>
-                            </div>
-                            <div class="text-center">
-                                <div class="signature-box mb-2"></div>
-                                <p class="font-bold text-blue-800 text-xs">ختم وتوقيع الإدارة</p>
-                                <p class="text-xs text-gray-600">التاريخ: ___________</p>
-                            </div>
-                            <div class="text-center">
-                                <div class="signature-box mb-2"></div>
-                                <p class="font-bold text-blue-800 text-xs">توقيع المدير</p>
-                                <p class="text-xs text-gray-600">التاريخ: ___________</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Footer Info -->
-                        <div class="mt-4 pt-2 border-t-2 border-gray-200 text-center text-xs text-gray-500">
-                            <p>هذا النموذج سري ولا يجوز تداوله إلا للمخول لهم بذلك | جميع الحقوق محفوظة © 2025</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- Mobile Header -->
+    <div class="mobile-bar">
+        <h3 style="font-size: 1rem;"><i class="fa-solid fa-graduation-cap"></i> بوابة النماذج الذكية</h3>
+        <button onclick="toggleSidebar()" style="background:none; border:none; color:#fff; font-size: 1.3rem;"><i class="fa-solid fa-bars"></i></button>
     </div>
 
+    <!-- القائمة الجانبية لإدخال البيانات -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <div>
+                <h2>إدارة الوثائق والمراسلات</h2>
+                <p>مدرسة الثروات الوطنية الخاصة</p>
+            </div>
+        </div>
+
+        <div class="sidebar-content">
+            
+            <!-- الهوية والشعار الموحد -->
+            <div class="form-card">
+                <div class="card-header-title"><i class="fa-solid fa-building-columns"></i> هوية المنشأة والشعار</div>
+                <div class="form-group">
+                    <label>اسم المنشأة التعليمية</label>
+                    <input type="text" class="form-control" id="orgNameInput" value="مدرسة الثروات الوطنية الخاصة" oninput="renderDocument()">
+                </div>
+                <div class="form-group">
+                    <label>تحميل شعار المدرسة الرسمي (شعار موحد)</label>
+                    <div class="file-upload-box">
+                        <input type="file" id="logoInput" accept="image/*">
+                        <i class="fa-solid fa-cloud-arrow-up" style="font-size:1.3rem; color:#38bdf8;"></i>
+                        <span>اختر صورة الشعار لاستبداله فوراً</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- بيانات الموظف المعني -->
+            <div class="form-card">
+                <div class="card-header-title"><i class="fa-solid fa-id-badge"></i> بيانات الموظف الأساسية</div>
+                <div class="form-group">
+                    <label>اسم الموظف الثلاثي / الرباعي</label>
+                    <input type="text" class="form-control" id="empNameInput" placeholder="أدخل اسم الموظف" oninput="renderDocument()">
+                </div>
+                <div class="form-group">
+                    <label>الرقم الوظيفي / الهوية الإماراتية</label>
+                    <input type="text" class="form-control" id="empIdInput" placeholder="784-XXXX-XXXXXXX-X" oninput="renderDocument()">
+                </div>
+                <div class="form-group">
+                    <label>المسمى الوظيفي</label>
+                    <input type="text" class="form-control" id="empJobInput" placeholder="مثال: معلم لغة عربية / إداري" oninput="renderDocument()">
+                </div>
+                <div class="form-group">
+                    <label>القسم / المرحلة التعليمية</label>
+                    <input type="text" class="form-control" id="empDeptInput" placeholder="مثال: قسم الحلقة الثانية - بنين" oninput="renderDocument()">
+                </div>
+            </div>
+
+            <!-- تحديد نوع النموذج -->
+            <div class="form-card">
+                <div class="card-header-title"><i class="fa-solid fa-file-signature"></i> نوع المعاملة والنموذج</div>
+                <div class="form-group">
+                    <label>اختر المعاملة المطلوبة</label>
+                    <select class="form-control" id="templateSelect" onchange="initFormFields()">
+                        <optgroup label="⚠️ التنبيهات والإنذارات الرسمية">
+                            <option value="warn_verbal">لفت نظر / تنبيه إداري موثق</option>
+                            <option value="warn_first">إنذار خطي أول (First Warning)</option>
+                            <option value="warn_final">إنذار خطي نهائي (Final Warning)</option>
+                        </optgroup>
+                        <optgroup label="📄 النماذج الإدارية والمالية">
+                            <option value="salary_cert" selected>شهادة راتب (لمن يهمه الأمر)</option>
+                            <option value="leave_req">طلب إجازة رسمية</option>
+                            <option value="resume_work">إشعار مباشرة عمل</option>
+                            <option value="clearance">شهادة إخلاء طرف وتسليم عهدة</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <!-- الحقول الديناميكية حسب النموذج -->
+                <div id="dynamicInputsArea"></div>
+            </div>
+
+            <!-- بطاقة الاتصال والدعم السريع -->
+            <div class="sidebar-support">
+                <p style="font-size:0.75rem; color:#94a3b8; margin-bottom:5px;">قنوات التواصل الرسمية لإدارة المدرسة</p>
+                <div class="support-links">
+                    <a href="https://wa.me/971543837551" target="_blank" class="support-btn btn-green">
+                        <i class="fa-brands fa-whatsapp"></i> 0543837551
+                    </a>
+                    <a href="mailto:altharawat.pvt@adek.gov.ae" class="support-btn btn-navy">
+                        <i class="fa-solid fa-envelope"></i> البريد المعتمد
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </aside>
+
+    <!-- مساحة العمل وعرض الصفحة التفاعلية -->
+    <main class="main-workspace">
+        <!-- شريط الأدوات العلوي -->
+        <div class="top-toolbar">
+            <div class="tool-btn-group">
+                <button class="tool-icon-btn" onclick="adjustZoom(-0.1)" title="تصغير"><i class="fa-solid fa-minus"></i></button>
+                <span id="zoomIndicator" style="font-weight:700; font-size:0.85rem; width:45px; text-align:center;">100%</span>
+                <button class="tool-icon-btn" onclick="adjustZoom(0.1)" title="تكبير"><i class="fa-solid fa-plus"></i></button>
+                <button class="tool-icon-btn" onclick="fitToWindow()" title="ملاءمة العرض"><i class="fa-solid fa-arrows-to-eye"></i></button>
+            </div>
+            
+            <div class="tool-btn-group">
+                <button class="action-btn action-btn-print" onclick="window.print()">
+                    <i class="fa-solid fa-print"></i> طباعة فورية
+                </button>
+                <button class="action-btn action-btn-pdf" onclick="exportPDF()" id="btnSavePdf">
+                    <i class="fa-solid fa-file-arrow-down"></i> حفظ كملف PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- منطقة المستند القابلة للتكبير والطباعة -->
+        <div class="paper-scroll-area" id="scrollArea">
+            <div class="paper-scale-container" id="scaleContainer">
+                
+                <div class="official-doc" id="docToExport">
+                    <!-- علامة مائية بالخلفية -->
+                    <img id="watermarkImg" class="watermark" src="https://cdn-icons-png.flaticon.com/512/3201/3201402.png" alt="Watermark">
+
+                    <div class="doc-inner">
+                        
+                        <!-- الترويسة الموحدة بشعار واحد أنيق -->
+                        <header class="doc-top-bar">
+                            <div class="header-col-meta">
+                                <div>دولة الإمارات العربية المتحدة</div>
+                                <div>التاريخ: <span id="lblDocDate"></span></div>
+                                <div>الرقم المرجعي: <span id="lblDocRef"></span></div>
+                            </div>
+
+                            <!-- الشعار الموحد في المنتصف -->
+                            <div class="header-col-logo">
+                                <img id="schoolMainLogo" class="header-school-logo" src="https://cdn-icons-png.flaticon.com/512/3201/3201402.png" alt="School Logo">
+                            </div>
+
+                            <div class="header-col-titles">
+                                <h4>UNITED ARAB EMIRATES</h4>
+                                <div>Ministry of Education</div>
+                                <div>Private Education Sector</div>
+                            </div>
+                        </header>
+
+                        <!-- العنوان والجهة المصدرة -->
+                        <div class="doc-heading-strip">
+                            <h1 class="doc-school-title" id="lblSchoolTitle">مدرسة الثروات الوطنية الخاصة</h1>
+                            <div class="doc-sub-title" id="lblDocumentType">شهادة تعريف بالراتب</div>
+                        </div>
+
+                        <!-- جدول بيانات الموظف الموحد والمتكامل -->
+                        <table class="emp-meta-table">
+                            <tr>
+                                <td class="label">اسم الموظف:</td>
+                                <td class="val" id="lblEmpName">........................................</td>
+                                <td class="label">رقم الهوية:</td>
+                                <td class="val" id="lblEmpId">........................................</td>
+                            </tr>
+                            <tr>
+                                <td class="label">المسمى الوظيفي:</td>
+                                <td class="val" id="lblEmpJob">........................................</td>
+                                <td class="label">القسم / الإدارة:</td>
+                                <td class="val" id="lblEmpDept">........................................</td>
+                            </tr>
+                        </table>
+
+                        <!-- نص الخطاب / المحتوى الرسمي المتغير -->
+                        <div class="doc-core-content" id="docTextBody"></div>
+
+                        <!-- مساحة الاعتمادات والتوقيعات والختم -->
+                        <div class="doc-signatures-section">
+                            <div class="sig-block" id="sigBlock1">
+                                <div class="sig-title" id="sigTitle1">الموظف المعني</div>
+                                <div class="sig-line"></div>
+                                <div class="sig-name">التوقيع والاسم</div>
+                            </div>
+
+                            <!-- الختم المعتمد للمؤسسة -->
+                            <div class="stamp-block">
+                                <i class="fa-solid fa-stamp" style="font-size:1.3rem; margin-bottom:4px;"></i>
+                                <span>الختم الرسمي</span>
+                            </div>
+
+                            <div class="sig-block" id="sigBlock2">
+                                <div class="sig-title" id="sigTitle2">الموارد البشرية</div>
+                                <div class="sig-line"></div>
+                                <div class="sig-name">الاعتماد والتاريخ</div>
+                            </div>
+
+                            <div class="sig-block" id="sigBlock3">
+                                <div class="sig-title" id="sigTitle3">اعتماد مدير المدرسة</div>
+                                <div class="sig-line"></div>
+                                <div class="sig-name">الختم والتوقيع المعتمد</div>
+                            </div>
+                        </div>
+
+                        <!-- تذييل الصفحة الرسمي والشريطي -->
+                        <footer class="doc-official-footer">
+                            <div class="footer-qr">
+                                <div id="docQrCode"></div>
+                                <div style="font-size:0.7rem; line-height:1.3;">
+                                    <strong>مستند إلكتروني رسمي ومعتمد</strong><br>
+                                    رمز التحقق الأمني الموحد
+                                </div>
+                            </div>
+
+                            <div class="footer-contacts">
+                                <span><i class="fa-solid fa-location-dot"></i> أبوظبي - الإمارات</span>
+                                <span><i class="fa-solid fa-phone"></i> +971 54 383 7551</span>
+                                <span><i class="fa-solid fa-envelope"></i> altharawat.pvt@adek.gov.ae</span>
+                            </div>
+                        </footer>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
     <script>
-        let selectedFormType = '';
-        
-        function selectForm(type) {
-            selectedFormType = type;
-            document.getElementById('formFields').classList.remove('hidden');
-            
-            // Clear additional fields
-            document.getElementById('additionalFields').innerHTML = '';
-            
-            // Update field labels based on form type
-            updateFieldLabels(type);
-            
-            // Add specific fields based on form type
-            addSpecificFields(type);
-            
-            // Set current date
-            document.getElementById('formDate').value = new Date().toISOString().split('T')[0];
-            
-            // Setup generation type change handler
-            setupGenerationTypeHandler();
-            
-            // Smooth scroll to form fields
-            setTimeout(() => {
-                document.getElementById('formFields').scrollIntoView({ 
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }, 100);
-        }
-        
-        function setupGenerationTypeHandler() {
-            const radioButtons = document.querySelectorAll('input[name="generationType"]');
-            const emptyFormNote = document.getElementById('emptyFormNote');
-            const generationOptions = document.querySelectorAll('.generation-option');
-            
-            radioButtons.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    // Update visual selection
-                    generationOptions.forEach(option => {
-                        option.classList.remove('border-primary', 'bg-blue-50');
-                        option.classList.add('border-gray-200');
-                    });
-                    
-                    const selectedOption = this.closest('.generation-option');
-                    selectedOption.classList.remove('border-gray-200');
-                    selectedOption.classList.add('border-primary', 'bg-blue-50');
-                    
-                    // Show/hide note for empty forms
-                    if (this.value === 'empty') {
-                        emptyFormNote.classList.remove('hidden');
-                    } else {
-                        emptyFormNote.classList.add('hidden');
-                    }
-                });
-            });
-        }
-        
-        function updateFieldLabels(type) {
-            const employeeNameLabel = document.getElementById('employeeNameLabel');
-            
-            if (type === 'no-transport') {
-                employeeNameLabel.textContent = 'اسم ولي الأمر الكامل';
-            } else {
-                employeeNameLabel.textContent = 'اسم الموظف الكامل';
-            }
-        }
-        
-        function addSpecificFields(type) {
-            const additionalFields = document.getElementById('additionalFields');
-            let fieldsHTML = '';
-            
-            switch(type) {
-                case 'vacation':
-                    fieldsHTML = `
-                        <div class="form-section p-6 rounded-lg mb-6">
-                            <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4">
-                                <i class="fas fa-calendar-alt text-primary mr-2"></i>
-                                تفاصيل الإجازة
-                            </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">تاريخ بداية الإجازة</label>
-                                    <input type="date" id="vacationStart" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">تاريخ نهاية الإجازة</label>
-                                    <input type="date" id="vacationEnd" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">نوع الإجازة</label>
-                                    <select id="vacationType" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
-                                        <option value="">اختر نوع الإجازة</option>
-                                        <option value="سنوية">إجازة سنوية</option>
-                                        <option value="مرضية">إجازة مرضية</option>
-                                        <option value="طارئة">إجازة طارئة</option>
-                                        <option value="أمومة">إجازة أمومة</option>
-                                        <option value="بدون راتب">إجازة بدون راتب</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">عدد الأيام</label>
-                                    <input type="number" id="vacationDays" placeholder="0" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">سبب الإجازة</label>
-                                    <textarea id="vacationReason" rows="3" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base"></textarea>
-                                </div>
-                            </div>
-                        </div>
+        // تعريف مكتبة النماذج والإنذارات المطورة
+        const documentTemplates = {
+            // الإنذارات والتنبيهات
+            warn_verbal: {
+                title: "لفت نظر إداري موثق",
+                sigs: ["توقيع الموظف بالعلم", "رئيس القسم المباشر", "إدارة الموارد البشرية"],
+                fields: [
+                    { id: "v_reason", label: "موضوع لفت النظر / المخالفة", type: "text", placeholder: "مثال: التأخر الصباحي المتكرر دون إذن" },
+                    { id: "v_date", label: "تاريخ المخالفة", type: "date" },
+                    { id: "v_notes", label: "توجيه الإدارة وتوصيات التحسين", type: "textarea", placeholder: "التوصية بضرورة الالتزام بمواعيد الدوام المقررة..." }
+                ],
+                render: (data) => `
+                    بناءً على ما تم رصده بتاريخ <strong>${formatDisplayDate(data.v_date)}</strong> بشأن (<strong>${data.v_reason || 'التقصير في المهام الوظيفية الموكلة'}</strong>)؛
+                    <br><br>
+                    تود إدارة المدرسة إحاطتكم بضرورة الالتزام التام بالتعليمات واللوائح المنظمة للعمل المدرسي، والحرص على عدم تكرار ما سلف تفادياً لاتخاذ الإجراءات الإدارية التدرجية وفقاً للائحة السلوك المهني والعمل المعمول بها في الدولة.
+                    <div class="alert-box alert-warning-style">
+                        <strong>ملاحظات وتوجيه الإدارة:</strong><br>
+                        ${data.v_notes || 'نأمل منكم بذل المزيد من الحرص والتعاون مع إدارة المدرسة لما فيه الصالح العام ومصلحة العملية التعليمية.'}
+                    </div>
+                    حرر هذا التنبيه ليكون بمثابة توجيه رسمي وللعمل بموجبه من تاريخه.
+                `
+            },
+            warn_first: {
+                title: "إنذار خطي أول (First Warning)",
+                sigs: ["توقيع الموظف بالاستلام", "مسؤول الموارد البشرية", "اعتماد مدير المدرسة"],
+                fields: [
+                    { id: "w1_subject", label: "سبب الإنذار والمخالفة", type: "text", placeholder: "مثال: عدم التقيد بالنصاب التدريسي والغياب بدون عذر" },
+                    { id: "w1_date", label: "تاريخ واقعة المخالفة", type: "date" },
+                    { id: "w1_legal", label: "بند اللائحة الإدارية", type: "text", placeholder: "مثال: المادة (28) من لائحة تنظيم علاقات العمل" },
+                    { id: "w1_details", label: "تفاصيل المخالفة", type: "textarea" }
+                ],
+                render: (data) => `
+                    نظراً لثبوت ارتكابكم المخالفة الإدارية المتمثلة في: (<strong>${data.w1_subject || 'عدم الالتزام بواجبات العمل المقررة'}</strong>) بتاريخ <strong>${formatDisplayDate(data.w1_date)}</strong>، 
+                    واستناداً إلى <strong>${data.w1_legal || 'لائحة السلوك المهني والتأديبي المعتمدة'}</strong>؛
+                    <br><br>
+                    فقد تقرر توجيه هذا <strong>(الإنذار الخطي الأول)</strong> إليكم رسمياً.
+                    <div class="alert-box alert-danger-style">
+                        <strong>تفاصيل الإفادة والواقعة:</strong><br>
+                        ${data.w1_details || 'تكرار ارتكاب المخالفة على الرغم من التنبيهات السابقة الشفهية، مما يؤثر سلباً على انتظام سير العملية التعليمية داخل المدرسة.'}
+                    </div>
+                    نحيطكم علماً بأن تكرار هذا التصرف مستقبلاً سيترتب عليه تطبيق عقوبات أشد قد تصل إلى الخصم من الراتب أو توجيه الإنذار النهائي طبقاً لقانون العمل.
+                `
+            },
+            warn_final: {
+                title: "إنذار خطي نهائي (Final Warning)",
+                sigs: ["الموظف المعني (بالعلم)", "الشؤون القانونية والموارد", "المدير العام للمدرسة"],
+                fields: [
+                    { id: "wf_violation", label: "المخالفة الجسيمة المرتكبة", type: "text", placeholder: "الإخلال الجسيم بالواجبات التعاقدية" },
+                    { id: "wf_prev_date", label: "تاريخ الإنذارات السابقة", type: "text", placeholder: "مثال: الإنذار الأول بتاريخ 12/01/2026" },
+                    { id: "wf_consequence", label: "الإجراء النهائي الصارم", type: "textarea", placeholder: "فسخ عقد العمل وإنهاء الخدمات في حال التكرار..." }
+                ],
+                render: (data) => `
+                    إشارة إلى سجل التدرج التأديبي الخاص بكم، وإلى الإنذارات الصادرة بحقكم سابقاً (<strong>${data.wf_prev_date || 'الإنذارات الخطية والشفهية المقيدة بالملف'}</strong>)؛
+                    <br><br>
+                    يؤسفنا إبلاغكم بتوجيه هذا <strong>(الإنذار الخطي النهائي)</strong> لعدم التزامكم بتصحيح الوضع واستمرار ارتكابكم لمخالفة: (<strong>${data.wf_violation || 'عدم الامتثال للتعليمات المهنية والتقصير الصريح'}</strong>).
+                    <div class="alert-box alert-danger-style">
+                        <strong>تحذير نهائي وقاطع:</strong><br>
+                        ${data.wf_consequence || 'يُعتبر هذا الإخطار الفرصة الأخيرة لكم لتعديل الأداء والالتزام ببنود العقد، وفي حال تكرار أي مخالفة من أي نوع، سيتم إنهاء خدمتكم فوراً وفصلكم من العمل طبقاً للمواد المعمول بها في قانون تنظيم العمل دون سابق إنذار إضافي.'}
+                    </div>
+                    يُودع أصل هذا الإنذار في ملفكم المهني بالموارد البشرية لإجراء المقتضى.
+                `
+            },
+            salary_cert: {
+                title: "شهادة تعريف بالراتب",
+                sigs: ["الموظف المعني", "مسؤول الرواتب", "مدير المدرسة"],
+                fields: [
+                    { id: "dest", label: "الجهة الموجه إليها المستند", type: "text", placeholder: "إلى من يهمه الأمر" },
+                    { id: "basic_sal", label: "الراتب الأساسي (درهم)", type: "number", placeholder: "مثال: 8000" },
+                    { id: "allowance", label: "إجمالي البدلات والمزايا (درهم)", type: "number", placeholder: "مثال: 4000" }
+                ],
+                render: (data) => {
+                    const basic = parseFloat(data.basic_sal) || 0;
+                    const allow = parseFloat(data.allowance) || 0;
+                    const total = basic + allow;
+                    return `
+                        إلى السادة / <strong>${data.dest || 'من يهمه الأمر المحترمين'}</strong>،<br><br>
+                        تحية طيبة وبعد،،<br><br>
+                        تشهد إدارة <strong>مدرسة الثروات الوطنية الخاصة</strong> بأن الموظف المذكورة بياناته بالجدول أعلاه يعمل لدينا ولا يزال على رأس عمله حتى تاريخ هذا الخطاب، ويتقاضى مخصصات مالية شهرية تفصيلها كالتالي:
+                        <br><br>
+                        - الراتب الأساسي الشهري: <strong>${basic.toLocaleString('en-US')} درهم إماراتي</strong>.<br>
+                        - إجمالي البدلات الشهرية: <strong>${allow.toLocaleString('en-US')} درهم إماراتي</strong>.<br>
+                        - إجمالي الراتب الشهري: <strong>${total.toLocaleString('en-US')} درهم إماراتي</strong>.<br><br>
+                        وقد قُدمت له هذه الشهادة بناءً على رغبته الشخصية لتقديمها إلى جهتكم الموقرة دون أن تتحمل المدرسة أي مسؤولية مالية أو كفالة تجاه الغير.
                     `;
-                    break;
-                case 'exit-permission':
-                    fieldsHTML = `
-                        <div class="form-section p-6 rounded-lg mb-6">
-                            <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4">
-                                <i class="fas fa-door-open text-primary mr-2"></i>
-                                تفاصيل إذن الخروج
-                            </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">وقت الخروج</label>
-                                    <input type="time" id="exitTime" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">وقت العودة المتوقع</label>
-                                    <input type="time" id="returnTime" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">المدة (بالساعات)</label>
-                                    <input type="number" id="duration" placeholder="0" step="0.5" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">الوجهة</label>
-                                    <input type="text" id="destination" placeholder="مكان الذهاب" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">سبب الخروج</label>
-                                    <textarea id="exitReason" rows="3" placeholder="اذكر السبب التفصيلي للخروج" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                case 'custody-receive':
-                case 'custody-handover':
-                    fieldsHTML = `
-                        <div class="form-section p-6 rounded-lg mb-6">
-                            <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4">
-                                <i class="fas fa-list text-primary mr-2"></i>
-                                تفاصيل العهدة
-                            </h3>
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">نوع العهدة</label>
-                                    <select id="custodyType" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
-                                        <option value="">اختر نوع العهدة</option>
-                                        <option value="أجهزة إلكترونية">أجهزة إلكترونية</option>
-                                        <option value="أثاث مكتبي">أثاث مكتبي</option>
-                                        <option value="مواد تعليمية">مواد تعليمية</option>
-                                        <option value="مفاتيح">مفاتيح</option>
-                                        <option value="سيارة">سيارة</option>
-                                        <option value="أخرى">أخرى</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">تفاصيل العهدة</label>
-                                    <textarea id="custodyDetails" rows="4" placeholder="اذكر تفاصيل الأصناف المستلمة/المسلمة مع الكميات والأرقام التسلسلية إن وجدت" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base"></textarea>
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">القيمة التقديرية</label>
-                                        <input type="number" id="estimatedValue" placeholder="0" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">الحالة</label>
-                                        <select id="custodyCondition" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
-                                            <option value="">اختر الحالة</option>
-                                            <option value="ممتازة">ممتازة</option>
-                                            <option value="جيدة">جيدة</option>
-                                            <option value="متوسطة">متوسطة</option>
-                                            <option value="تحتاج صيانة">تحتاج صيانة</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                case 'warning':
-                case 'violation':
-                    fieldsHTML = `
-                        <div class="form-section p-6 rounded-lg mb-6">
-                            <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4">
-                                <i class="fas fa-exclamation-triangle text-primary mr-2"></i>
-                                تفاصيل ${type === 'warning' ? 'الإنذار' : 'المخالفة'}
-                            </h3>
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">نوع ${type === 'warning' ? 'الإنذار' : 'المخالفة'}</label>
-                                    <select id="violationType" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
-                                        <option value="">اختر النوع</option>
-                                        <option value="تأخير">تأخير في الحضور</option>
-                                        <option value="غياب">غياب بدون عذر</option>
-                                        <option value="سلوك">سوء سلوك</option>
-                                        <option value="إهمال">إهمال في العمل</option>
-                                        <option value="مخالفة أمنية">مخالفة أمنية</option>
-                                        <option value="أخرى">أخرى</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">التاريخ والوقت</label>
-                                    <input type="datetime-local" id="violationDateTime" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">تفاصيل ${type === 'warning' ? 'الإنذار' : 'المخالفة'}</label>
-                                    <textarea id="details" rows="3" placeholder="اذكر التفاصيل الكاملة للمخالفة أو سبب الإنذار" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base"></textarea>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">الإجراء المطلوب</label>
-                                    <textarea id="requiredAction" rows="2" placeholder="ما هو الإجراء المطلوب من الموظف" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                default:
-                    fieldsHTML = `
-                        <div class="form-section p-6 rounded-lg mb-6">
-                            <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4">
-                                <i class="fas fa-info-circle text-primary mr-2"></i>
-                                تفاصيل إضافية
-                            </h3>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ملاحظات</label>
-                                <textarea id="additionalDetails" rows="4" placeholder="أضف أي تفاصيل إضافية تخص النموذج" class="input-enhanced w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base"></textarea>
-                            </div>
-                        </div>
-                    `;
-            }
-            
-            additionalFields.innerHTML = fieldsHTML;
-        }
-        
-        function generateForm() {
-            if (!selectedFormType) return;
-            
-            const generationType = document.querySelector('input[name="generationType"]:checked').value;
-            const employeeName = document.getElementById('employeeName').value;
-            const employeeId = document.getElementById('employeeId').value;
-            const jobTitle = document.getElementById('jobTitle').value;
-            const formDate = document.getElementById('formDate').value;
-            
-            // For filled forms, validate required fields
-            if (generationType === 'filled' && (!employeeName || !employeeId || !jobTitle || !formDate)) {
-                showCustomAlert('يرجى ملء جميع البيانات المطلوبة للنموذج المملوء');
-                return;
-            }
-            
-            const formTitles = {
-                'work-start': 'نموذج مباشرة عمل',
-                'vacation': 'نموذج طلب إجازة',
-                'termination': 'نموذج إنهاء خدمات',
-                'resignation': 'نموذج استقالة',
-                'exit-permission': 'نموذج إذن خروج',
-                'custody-receive': 'نموذج استلام عهدة',
-                'custody-handover': 'نموذج تسليم عهدة',
-                'no-transport': 'نموذج عدم استخدام النقل المدرسي',
-                'warning': 'نموذج إنذار',
-                'violation': 'نموذج مخالفة'
-            };
-            
-            const formCategories = {
-                'work-start': 'الموارد البشرية',
-                'vacation': 'الموارد البشرية',
-                'termination': 'الموارد البشرية',
-                'resignation': 'الموارد البشرية',
-                'exit-permission': 'النماذج الإدارية',
-                'custody-receive': 'نماذج العهد',
-                'custody-handover': 'نماذج العهد',
-                'no-transport': 'النماذج الإدارية',
-                'warning': 'النماذج التأديبية',
-                'violation': 'النماذج التأديبية'
-            };
-            
-            // Update header with settings data
-            document.getElementById('headerSchoolName').textContent = document.getElementById('schoolName').value;
-            document.getElementById('headerSchoolNameEn').textContent = document.getElementById('schoolNameEn').value;
-            document.getElementById('headerSchoolPhone').textContent = document.getElementById('schoolPhone').value;
-            document.getElementById('headerSchoolAddress').textContent = document.getElementById('schoolAddress').value;
-            
-            // Update form type badge
-            document.getElementById('formTypeBadge').textContent = formCategories[selectedFormType] || 'نوع النموذج';
-            
-            // Update generation type badge
-            const generationTypeBadge = document.getElementById('generationTypeBadge');
-            if (generationType === 'empty') {
-                generationTypeBadge.style.display = 'none';
-            } else {
-                generationTypeBadge.style.display = 'inline-block';
-                generationTypeBadge.textContent = 'نموذج مملوء';
-                generationTypeBadge.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
-            }
-            
-            // Update display labels based on form type
-            if (selectedFormType === 'no-transport') {
-                document.getElementById('displayEmployeeNameHeader').textContent = 'ولي الأمر';
-                document.getElementById('signatureLabel1').textContent = 'توقيع ولي الأمر';
-            } else {
-                document.getElementById('displayEmployeeNameHeader').textContent = 'اسم الموظف';
-                document.getElementById('signatureLabel1').textContent = 'توقيع الموظف';
-            }
-            
-            // Fill form header data
-            document.getElementById('formTitle').textContent = formTitles[selectedFormType];
-            
-            if (generationType === 'empty') {
-                // Generate empty form with editable fields
-                generateEmptyForm();
-            } else {
-                // Generate filled form
-                generateFilledForm(employeeName, employeeId, jobTitle, formDate);
-            }
-            
-            // Generate form number and reference
-            const formNumber = '2025' + Math.random().toString().substr(2, 6);
-            const referenceNumber = selectedFormType.toUpperCase() + '-' + Math.random().toString().substr(2, 4);
-            document.getElementById('formNumber').textContent = formNumber;
-            document.getElementById('referenceNumber').textContent = referenceNumber;
-            document.getElementById('creationDate').textContent = new Date().toLocaleDateString('en-GB') + ' ' + new Date().toLocaleTimeString('en-GB');
-            
-            document.getElementById('printArea').classList.remove('hidden');
-            
-            // Scroll to generated form
-            document.getElementById('printArea').scrollIntoView({ behavior: 'smooth' });
-        }
-        
-        function generateEmptyForm() {
-            // Create editable fields for basic info without placeholders
-            document.getElementById('displayEmployeeName').innerHTML = `<span class="editable-field" contenteditable="true"></span>`;
-            document.getElementById('displayEmployeeId').innerHTML = `<span class="editable-field" contenteditable="true"></span>`;
-            document.getElementById('displayJobTitle').innerHTML = `<span class="editable-field" contenteditable="true"></span>`;
-            document.getElementById('displayFormDate').innerHTML = `<span class="editable-field" contenteditable="true"></span>`;
-            document.getElementById('displayEmployeePhone').innerHTML = `<span class="editable-field" contenteditable="true"></span>`;
-            document.getElementById('displayDepartment').innerHTML = `<span class="editable-field" contenteditable="true"></span>`;
-            
-            // Generate empty content based on form type
-            let content = generateEmptyFormContent(selectedFormType);
-            document.getElementById('formContent').innerHTML = content;
-            
-            // Clear additional data
-            document.getElementById('allFormData').innerHTML = '<strong>نموذج فارغ - يرجى ملء البيانات المطلوبة</strong>';
-        }
-        
-        function generateFilledForm(employeeName, employeeId, jobTitle, formDate) {
-            document.getElementById('displayEmployeeName').textContent = employeeName;
-            document.getElementById('displayEmployeeId').textContent = employeeId;
-            document.getElementById('displayJobTitle').textContent = jobTitle;
-            document.getElementById('displayFormDate').textContent = new Date(formDate).toLocaleDateString('en-GB');
-            document.getElementById('displayEmployeePhone').textContent = document.getElementById('employeePhone').value || 'غير محدد';
-            document.getElementById('displayDepartment').textContent = document.getElementById('department').value || 'غير محدد';
-            
-            // Collect all form data
-            const allData = collectAllFormData();
-            document.getElementById('allFormData').innerHTML = '<strong>جميع البيانات المدخلة:</strong><br>' + allData;
-            
-            let content = generateFormContent(selectedFormType, {
-                employeeName, employeeId, jobTitle, formDate
-            });
-            
-            document.getElementById('formContent').innerHTML = content;
-        }
-        
-        function generateEmptyFormContent(type) {
-            const personLabel = type === 'no-transport' ? 'ولي الأمر' : 'الموظف/ة';
-            let content = '';
-            
-            switch(type) {
-                case 'work-start':
-                    content = `
-                        <p class="text-sm leading-relaxed mb-4">
-                            نعلمكم أنه تم مباشرة ${personLabel} 
-                            <span class="editable-field" contenteditable="true"></span>
-                            للعمل بمدرسة الثروات الوطنية الخاصة اعتباراً من تاريخ 
-                            <span class="editable-field" contenteditable="true"></span>
-                            في منصب 
-                            <span class="editable-field" contenteditable="true"></span>
-                            .<br>
-                            نرجو الالتزام بالأنظمة واللوائح المدرسية والتقيد بمواعيد العمل المحددة والمحافظة على سرية المعلومات.
-                        </p>
-                        <div class="mt-4">
-                            <strong>ملاحظات إضافية:</strong>
-                            <textarea class="editable-textarea"></textarea>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'vacation':
-                    content = `
-                        <p class="text-sm leading-relaxed mb-4">
-                            نعلمكم أنه تم طلب إجازة من ${personLabel} 
-                            <span class="editable-field" contenteditable="true"></span>
-                            من تاريخ 
-                            <span class="editable-field" contenteditable="true"></span>
-                            إلى تاريخ 
-                            <span class="editable-field" contenteditable="true"></span>
-                            .<br>
-                            نوع الإجازة: 
-                            <span class="editable-field" contenteditable="true"></span>
-                            <br>
-                            سبب الإجازة: 
-                            <span class="editable-field" contenteditable="true"></span>
-                        </p>
-                        <div class="mt-4">
-                            <strong>تفاصيل إضافية:</strong>
-                            <textarea class="editable-textarea"></textarea>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'termination':
-                    content = `
-                        <p class="text-sm leading-relaxed mb-4">
-                            نعلمكم أنه تم إنهاء خدمات ${personLabel} 
-                            <span class="editable-field" contenteditable="true"></span>
-                            من مدرسة الثروات الوطنية الخاصة اعتباراً من تاريخ 
-                            <span class="editable-field" contenteditable="true"></span>
-                            .<br>
-                            تم تسوية جميع المستحقات المالية واستلام العهد والممتلكات المدرسية وتسليم شهادة الخبرة وإلغاء جميع الصلاحيات.
-                        </p>
-                        <div class="mt-4">
-                            <strong>سبب الإنهاء:</strong>
-                            <textarea class="editable-textarea"></textarea>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'exit-permission':
-                    content = `
-                        <p class="text-sm leading-relaxed mb-4">
-                            نعلمكم أنه تم طلب إذن خروج أثناء العمل للموظف/ة 
-                            <span class="editable-field" contenteditable="true"></span>
-                            في تاريخ 
-                            <span class="editable-field" contenteditable="true"></span>
-                            من الساعة 
-                            <span class="editable-field" contenteditable="true"></span>
-                            إلى الساعة 
-                            <span class="editable-field" contenteditable="true"></span>
-                            .<br>
-                            الوجهة: 
-                            <span class="editable-field" contenteditable="true"></span>
-                        </p>
-                        <div class="mt-4">
-                            <strong>سبب الخروج:</strong>
-                            <textarea class="editable-textarea"></textarea>
-                        </div>
-                    `;
-                    break;
-                    
-                default:
-                    content = `
-                        <p class="text-sm leading-relaxed mb-4">
-                            نعلمكم أنه 
-                            <span class="editable-field" contenteditable="true"></span>
-                        </p>
-                        <div class="mt-4">
-                            <strong>التفاصيل:</strong>
-                            <textarea class="editable-textarea"></textarea>
-                        </div>
-                    `;
-            }
-            
-            return content;
-        }
-        
-        function collectAllFormData() {
-            const data = [];
-            
-            // Basic fields
-            const basicFields = [
-                { id: 'employeeName', label: selectedFormType === 'no-transport' ? 'ولي الأمر' : 'اسم الموظف' },
-                { id: 'employeeId', label: 'رقم الهوية' },
-                { id: 'jobTitle', label: 'المسمى الوظيفي' },
-                { id: 'formDate', label: 'تاريخ الإجراء' },
-                { id: 'employeePhone', label: 'رقم الهاتف' },
-                { id: 'department', label: 'القسم/الإدارة' }
-            ];
-            
-            basicFields.forEach(field => {
-                const element = document.getElementById(field.id);
-                if (element && element.value) {
-                    data.push(`${field.label}: ${element.value}`);
                 }
-            });
-            
-            // Additional fields based on form type
-            const additionalElements = document.getElementById('additionalFields').querySelectorAll('input, select, textarea');
-            additionalElements.forEach(element => {
-                if (element.value) {
-                    const label = element.previousElementSibling?.textContent || element.id;
-                    data.push(`${label}: ${element.value}`);
-                }
-            });
-            
-            return data.join(' | ');
-        }
-        
-        function generateFormContent(type, data) {
-            const date = new Date(data.formDate).toLocaleDateString('en-GB');
-            const personLabel = type === 'no-transport' ? 'ولي الأمر' : 'الموظف/ة';
-            
-            let content = '';
-            
-            switch(type) {
-                case 'work-start':
-                    content += `
-                        <p class="text-sm leading-relaxed mb-4">
-                            نعلمكم أنه تم مباشرة الموظف/ة <strong>${data.employeeName}</strong> للعمل بمدرسة الثروات الوطنية الخاصة اعتباراً من تاريخ <strong>${date}</strong> في منصب <strong>${data.jobTitle}</strong>.<br>
-                            نرجو الالتزام بالأنظمة واللوائح المدرسية والتقيد بمواعيد العمل المحددة والمحافظة على سرية المعلومات.
-                        </p>
-                    `;
-                    break;
-                    
-                case 'vacation':
-                    const vacationStart = document.getElementById('vacationStart')?.value;
-                    const vacationEnd = document.getElementById('vacationEnd')?.value;
-                    const vacationType = document.getElementById('vacationType')?.value;
-                    const vacationReason = document.getElementById('vacationReason')?.value;
-                    
-                    content += `
-                        <p class="text-sm leading-relaxed mb-4">
-                            نعلمكم أنه تم طلب إجازة من الموظف/ة <strong>${data.employeeName}</strong> من تاريخ <strong>${vacationStart ? new Date(vacationStart).toLocaleDateString('en-GB') : '___________'}</strong> إلى تاريخ <strong>${vacationEnd ? new Date(vacationEnd).toLocaleDateString('en-GB') : '___________'}</strong>.<br>
-                            نوع الإجازة: <strong>${vacationType || 'غير محدد'}</strong><br>
-                            سبب الإجازة: <strong>${vacationReason || 'غير محدد'}</strong><br>
-                            نرجو الموافقة على طلب الإجازة مع مراعاة احتياجات العمل.
-                        </p>
-                    `;
-                    break;
-                    
-                case 'termination':
-                    content += `
-                        <p class="text-sm leading-relaxed mb-4">
-                            نعلمكم أنه تم إنهاء خدمات الموظف/ة <strong>${data.employeeName}</strong> من مدرسة الثروات الوطنية الخاصة اعتباراً من تاريخ <strong>${date}</strong>.<br>
-                            تم تسوية جميع المستحقات المالية واستلام العهد والممتلكات المدرسية وتسليم شهادة الخبرة وإلغاء جميع الصلاحيات.
-                        </p>
-                    `;
-                    break;
-                    
-                case 'resignation':
-                    content += `
-                        <p class="text-sm leading-relaxed mb-4">
-                            نعلمكم أنه تم تقديم طلب استقالة من الموظف/ة <strong>${data.employeeName}</strong> من العمل بمدرسة الثروات الوطنية الخاصة اعتباراً من تاريخ <strong>${date}</strong>.<br>
-                            يتعهد الموظف بتسليم جميع الملفات والوثائق وإنهاء المهام المعلقة ونقل المسؤوليات للموظف البديل.
-                        </p>
-                    `;
-                    break;
-                    
-                case 'exit-permission':
-                    const exitTime = document.getElementById('exitTime')?.value;
-                    const returnTime = document.getElementById('returnTime')?.value;
-                    const destination = document.getElementById('destination')?.value;
-                    const exitReason = document.getElementById('exitReason')?.value;
-                    
-                    content += `
-                        <p class="text-sm leading-relaxed mb-4">
-                            نعلمكم أنه تم طلب إذن خروج أثناء العمل للموظف/ة <strong>${data.employeeName}</strong> في تاريخ <strong>${date}</strong> من الساعة <strong>${exitTime || '___'}</strong> إلى الساعة <strong>${returnTime || '___'}</strong>.<br>
-                            الوجهة: <strong>${destination || 'غير محدد'}</strong><br>
-                            سبب الخروج: <strong>${exitReason || 'غير محدد'}</strong><br>
-                            نرجو الموافقة على طلب الخروج مع التأكيد على العودة في الوقت المحدد.
-                        </p>
-                    `;
-                    break;
-                    
-                case 'custody-receive':
-                    const receiveDetails = document.getElementById('custodyDetails')?.value;
-                    const custodyType = document.getElementById('custodyType')?.value;
-                    
-                    content += `
-                        <p class="text-sm leading-relaxed mb-4">
-                            نعلمكم أنه قد تم استلام عهدة من قبل الموظف/ة <strong>${data.employeeName}</strong> بتاريخ <strong>${date}</strong> وهي <strong>${custodyType || 'غير محدد'}</strong>.<br>
-                            التفاصيل: ${receiveDetails || 'يرجى تحديد التفاصيل'}. يتعهد الموظف بالمحافظة على العهدة وإرجاعها في نفس الحالة عند الطلب.
-                        </p>
-                    `;
-                    break;
-                    
-                case 'custody-handover':
-                    const handoverDetails = document.getElementById('custodyDetails')?.value;
-                    const handoverType = document.getElementById('custodyType')?.value;
-                    
-                    content += `
-                        <p class="text-sm leading-relaxed mb-4">
-                            نعلمكم أنه قد تم تسليم عهدة من قبل الموظف/ة <strong>${data.employeeName}</strong> بتاريخ <strong>${date}</strong> وهي <strong>${handoverType || 'غير محدد'}</strong>.<br>
-                            التفاصيل: ${handoverDetails || 'يرجى تحديد التفاصيل'}. العهدة مسلمة بحالة جيدة وبهذا تبرأ ذمة الموظف من هذه العهدة.
-                        </p>
-                    `;
-                    break;
-                    
-                case 'no-transport':
-                    content += `
-                        <p class="text-sm leading-relaxed mb-4">
-                            نعلمكم أنه تم الإعلام بعدم استخدام خدمة النقل المدرسي للطالب/ة ابن/ابنة <strong>${data.employeeName}</strong> للعام الدراسي الحالي.<br>
-                            يتحمل ولي الأمر مسؤولية النقل والالتزام بمواعيد الحضور والانصراف والمسؤولية الكاملة عن سلامة الطالب/ة أثناء النقل.
-                        </p>
-                    `;
-                    break;
-                    
-                case 'warning':
-                    const warningDetails = document.getElementById('details')?.value;
-                    const warningType = document.getElementById('violationType')?.value;
-                    
-                    content += `
-                        <p class="text-sm leading-relaxed mb-4">
-                            نعلمكم أنه تم توجيه إنذار رسمي للموظف/ة <strong>${data.employeeName}</strong> بتاريخ <strong>${date}</strong> بخصوص <strong>${warningType || 'غير محدد'}</strong>.<br>
-                            التفاصيل: ${warningDetails || 'يرجى تحديد التفاصيل'}. نحذر من تكرار هذا السلوك وسيدرج هذا الإنذار في الملف الوظيفي.
-                        </p>
-                    `;
-                    break;
-                    
-                case 'violation':
-                    const violationDetails = document.getElementById('details')?.value;
-                    const violationType = document.getElementById('violationType')?.value;
-                    
-                    content += `
-                        <p class="text-sm leading-relaxed mb-4">
-                            نعلمكم أنه تم رصد مخالفة من قبل الموظف/ة <strong>${data.employeeName}</strong> بتاريخ <strong>${date}</strong> من نوع <strong>${violationType || 'غير محدد'}</strong>.<br>
-                            التفاصيل: ${violationDetails || 'يرجى تحديد التفاصيل'}. يرجى من الموظف التوقيع على علمه بهذه المخالفة والالتزام بعدم تكرارها.
-                        </p>
-                    `;
-                    break;
-                    
-                default:
-                    const additionalDetails = document.getElementById('additionalDetails')?.value;
-                    content += `
-                        <p class="text-sm leading-relaxed">
-                            نعلمكم أنه ${additionalDetails || 'تفاصيل النموذج...'}.<br>
-                            نرجو الاطلاع والتوقيع للعلم.
-                        </p>
-                    `;
+            },
+            leave_req: {
+                title: "طلب إجازة رسمية",
+                sigs: ["مقدم الطلب", "المدير المباشر", "اعتماد الإدارة"],
+                fields: [
+                    { id: "l_type", label: "نوع الإجازة", type: "select", options: ["إجازة سنوية اعتيادية", "إجازة مرضية معتمدة", "إجازة طارئة / اضطرارية", "إجازة بدون راتب"] },
+                    { id: "l_start", label: "تاريخ البدء", type: "date" },
+                    { id: "l_days", label: "عدد الأيام", type: "number" },
+                    { id: "l_alt", label: "المعلم / الموظف البديل لتغطية المهام", type: "text" }
+                ],
+                render: (data) => `
+                    أتقدم لسيادتكم بطلب منحي (<strong>${data.l_type || 'إجازة اعتيادية'}</strong>) لمدة <strong>${data.l_days || '...'} يوم/أيام</strong>، وذلك اعتباراً من تاريخ <strong>${formatDisplayDate(data.l_start)}</strong>.<br><br>
+                    وأفيدكم بأنه قد تم التنسيق مع الزميل البديل: <strong>${data.l_alt || '........................'}</strong> لتغطية الجدول والحصص والمهام الموكلة إليّ طوال فترة الإجازة، على أن أباشر مهامي فور انتهائها.
+                `
+            },
+            resume_work: {
+                title: "إشعار مباشرة عمل",
+                sigs: ["الموظف", "النائب الأكاديمي / الإداري", "الموارد البشرية"],
+                fields: [
+                    { id: "r_date", label: "تاريخ المباشرة الفعلي", type: "date" },
+                    { id: "r_cause", label: "نوع المباشرة", type: "select", options: ["تعيين جديد واستلام العمل", "عودة من إجازة دورية", "عودة من إجازة وضع / مرضية"] }
+                ],
+                render: (data) => `
+                    نفيدكم علماً بأن الموظف المذكورة بياناته أعلاه قد باشر مهامه الوظيفية الموكلة إليه في المدرسة بشكل رسمي وفعلي اعتباراً من تاريخ: <strong>${formatDisplayDate(data.r_date)}</strong>، وذلك إثر: (<strong>${data.r_cause || 'استلام العمل الرسمي'}</strong>).<br><br>
+                    يرجى من قسم الموارد البشرية والشؤون المالية اعتماد تاريخ المباشرة وإجراء التسويات الإدارية اللازمة.
+                `
+            },
+            clearance: {
+                title: "شهادة إخلاء طرف وتسليم عهدة",
+                sigs: ["الموظف المسلّم", "أمين المستودعات والتقنية", "مدير الشؤون المالية والإدارية"],
+                fields: [
+                    { id: "c_reason", label: "سبب إخلاء الطرف", type: "select", options: ["انتهاء العقد والخدمة", "الاستقالة", "نقل كفالة / تغيير وظيفة"] },
+                    { id: "c_items", label: "بيان العهد التي تم استلامها وإخلاؤها", type: "textarea", placeholder: "جهاز لابتوب، بطاقة الدخول، المفاتيح..." }
+                ],
+                render: (data) => `
+                    تشهد إدارة المدرسة بأن الموظف المذكور أعلاه قد قام بتسليم كافة العهد المالية والمكتبية والتقنية الخاصة بالمدرسة والموضحة أدناه:<br>
+                    <div class="alert-box alert-warning-style">
+                        <strong>العهد المسلمة:</strong> ${data.c_items || 'الأجهزة الإلكترونية، سجلات التدريس، المفاتيح، والبطاقات التعريفية.'}
+                    </div>
+                    وبناءً عليه تم إخلاء طرفه من أي التزامات عينية أو مادية تجاه المدرسة حتى تاريخ إصدار هذا المستند.
+                `
             }
-            
-            return content;
+        };
+
+        let currentScale = 1;
+        let qrCodeInstance = null;
+
+        // إعداد التاريخ والرقم المرجعي
+        function initPageMeta() {
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('ar-EG', { year:'numeric', month:'long', day:'numeric' });
+            document.getElementById('lblDocDate').innerText = dateStr;
+
+            const randomCode = Math.floor(100000 + Math.random() * 900000);
+            const refNumber = `ATH-${today.getFullYear()}-${randomCode}`;
+            document.getElementById('lblDocRef').innerText = refNumber;
+
+            // إعداد QR
+            qrCodeInstance = new QRCode(document.getElementById("docQrCode"), {
+                width: 58,
+                height: 58,
+                colorDark: "#0f2744",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
         }
-        
-        // Initialize app
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeApp();
+
+        function formatDisplayDate(dStr) {
+            if(!dStr) return '............';
+            const parts = dStr.split('-');
+            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+
+        // بناء الحقول التفاعلية حسب نوع النموذج المحدد
+        function initFormFields() {
+            const type = document.getElementById('templateSelect').value;
+            const config = documentTemplates[type];
+            const container = document.getElementById('dynamicInputsArea');
+            container.innerHTML = '';
+
+            config.fields.forEach(f => {
+                let elementHtml = '';
+                if(f.type === 'select') {
+                    const options = f.options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+                    elementHtml = `<select id="field_${f.id}" class="form-control" onchange="renderDocument()">${options}</select>`;
+                } else if(f.type === 'textarea') {
+                    elementHtml = `<textarea id="field_${f.id}" class="form-control" placeholder="${f.placeholder||''}" oninput="renderDocument()"></textarea>`;
+                } else {
+                    elementHtml = `<input type="${f.type}" id="field_${f.id}" class="form-control" placeholder="${f.placeholder||''}" oninput="renderDocument()">`;
+                }
+
+                container.innerHTML += `
+                    <div class="form-group">
+                        <label>${f.label}</label>
+                        ${elementHtml}
+                    </div>
+                `;
+            });
+
+            // تحديث عناوين التوقيعات
+            document.getElementById('sigTitle1').innerText = config.sigs[0] || '';
+            document.getElementById('sigTitle2').innerText = config.sigs[1] || '';
+            document.getElementById('sigTitle3').innerText = config.sigs[2] || '';
+
+            renderDocument();
+        }
+
+        // عرض وتحديث المعاينة الحية للوثيقة
+        function renderDocument() {
+            const orgName = document.getElementById('orgNameInput').value || 'مدرسة الثروات الوطنية الخاصة';
+            const empName = document.getElementById('empNameInput').value || '........................................';
+            const empId = document.getElementById('empIdInput').value || '........................................';
+            const empJob = document.getElementById('empJobInput').value || '........................................';
+            const empDept = document.getElementById('empDeptInput').value || '........................................';
+
+            document.getElementById('lblSchoolTitle').innerText = orgName;
+            document.getElementById('lblEmpName').innerText = empName;
+            document.getElementById('lblEmpId').innerText = empId;
+            document.getElementById('lblEmpJob').innerText = empJob;
+            document.getElementById('lblEmpDept').innerText = empDept;
+
+            const type = document.getElementById('templateSelect').value;
+            const config = documentTemplates[type];
+
+            document.getElementById('lblDocumentType').innerText = config.title;
+
+            // جمع قيم الحقول الديناميكية
+            const data = {};
+            config.fields.forEach(f => {
+                const el = document.getElementById(`field_${f.id}`);
+                data[f.id] = el ? el.value : '';
+            });
+
+            document.getElementById('docTextBody').innerHTML = config.render(data);
+
+            // تحديث QR
+            const ref = document.getElementById('lblDocRef').innerText;
+            qrCodeInstance.clear();
+            qrCodeInstance.makeCode(`وثيقة رسمية: ${config.title}\nالمرجع: ${ref}\nالموظف: ${empName}\nالمؤسسة: ${orgName}`);
+        }
+
+        // معالجة تغيير الشعار الموحد
+        document.getElementById('logoInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const dataUrl = evt.target.result;
+                    document.getElementById('schoolMainLogo').src = dataUrl;
+                    document.getElementById('watermarkImg').src = dataUrl;
+                    localStorage.setItem('savedUnifiedLogo', dataUrl);
+                };
+                reader.readAsDataURL(file);
+            }
         });
 
-        function initializeApp() {
-            // Set today's date in Gregorian format
-            const today = new Date().toLocaleDateString('en-GB', {
-                day: 'numeric',
-                month: 'short'
-            });
-            document.getElementById('todayDate').textContent = today;
-            
-            // Initialize search and filter
-            initializeSearchAndFilter();
-            
-            // Load saved settings
-            loadSettings();
-            
-            // Update statistics
-            updateStatistics();
+        // التكبير وملاءمة الشاشة
+        function adjustZoom(delta) {
+            currentScale = Math.min(Math.max(0.4, currentScale + delta), 1.5);
+            updateScaleUI();
         }
 
-        function initializeSearchAndFilter() {
-            const searchInput = document.getElementById('searchForms');
-            const categoryFilter = document.getElementById('categoryFilter');
-            const formButtons = document.querySelectorAll('.form-card');
-
-            function filterForms() {
-                const searchTerm = searchInput.value.toLowerCase();
-                const selectedCategory = categoryFilter.value;
-
-                formButtons.forEach(button => {
-                    const title = button.querySelector('h3').textContent.toLowerCase();
-                    const description = button.querySelector('p').textContent.toLowerCase();
-                    const category = button.dataset.category;
-
-                    const matchesSearch = title.includes(searchTerm) || description.includes(searchTerm);
-                    const matchesCategory = !selectedCategory || category === selectedCategory;
-
-                    button.style.display = (matchesSearch && matchesCategory) ? 'block' : 'none';
-                });
+        function fitToWindow() {
+            const containerWidth = document.getElementById('scrollArea').clientWidth;
+            if(containerWidth < 850) {
+                currentScale = (containerWidth - 30) / 800;
+            } else {
+                currentScale = 1;
             }
-
-            searchInput.addEventListener('input', filterForms);
-            categoryFilter.addEventListener('change', filterForms);
+            updateScaleUI();
         }
 
-        function toggleSettings() {
-            const panel = document.getElementById('settingsPanel');
-            panel.classList.toggle('hidden');
+        function updateScaleUI() {
+            document.getElementById('scaleContainer').style.transform = `scale(${currentScale})`;
+            document.getElementById('zoomIndicator').innerText = `${Math.round(currentScale * 100)}%`;
         }
 
-        function saveSettings() {
-            showNotification('تم حفظ الإعدادات بنجاح', 'success');
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
         }
 
-        function loadSettings() {
-            // Keep default values for now
-        }
+        // تصدير PDF بجودة الطباعة
+        function exportPDF() {
+            const docElement = document.getElementById('docToExport');
+            const empName = document.getElementById('empNameInput').value || 'موظف';
+            const docTitle = document.getElementById('lblDocumentType').innerText;
+            const btn = document.getElementById('btnSavePdf');
 
-        function updateStatistics() {
-            document.getElementById('totalForms').textContent = '10';
-            const downloadCount = localStorage.getItem('downloadCount') || '0';
-            document.getElementById('downloadCount').textContent = downloadCount;
-            const employeeCount = localStorage.getItem('employeeCount') || '0';
-            document.getElementById('employeeCount').textContent = employeeCount;
-        }
+            const prevTransform = document.getElementById('scaleContainer').style.transform;
+            document.getElementById('scaleContainer').style.transform = 'scale(1)';
 
-        function incrementDownloadCount() {
-            const currentCount = parseInt(localStorage.getItem('downloadCount') || '0');
-            localStorage.setItem('downloadCount', (currentCount + 1).toString());
-            updateStatistics();
-        }
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري الإنشاء...';
 
-        function downloadPDF() {
-            if (document.getElementById('printArea').classList.contains('hidden')) {
-                showCustomAlert('يرجى توليد النموذج أولاً');
-                return;
-            }
-
-            showLoadingSpinner('جاري تحضير ملف PDF...');
-
-            try {
-                const element = document.getElementById('printArea');
-                const formTitle = document.getElementById('formTitle').textContent;
-                const filename = `${formTitle}_${new Date().toISOString().split('T')[0]}.pdf`;
-
-                // Create canvas with high resolution
-                html2canvas(element, {
-                    scale: 2,
-                    useCORS: true,
-                    allowTaint: true,
-                    backgroundColor: '#ffffff',
-                    width: element.scrollWidth,
-                    height: element.scrollHeight,
-                    windowWidth: element.scrollWidth,
-                    windowHeight: element.scrollHeight
-                }).then(canvas => {
-                    try {
-                        const imgData = canvas.toDataURL('image/png', 1.0);
-                        
-                        // Create PDF with proper A4 dimensions
-                        const { jsPDF } = window.jspdf;
-                        const pdf = new jsPDF('p', 'mm', 'a4');
-                        
-                        // A4 dimensions in mm
-                        const pdfWidth = 210;
-                        const pdfHeight = 297;
-                        
-                        // Calculate image dimensions to fit A4
-                        const imgWidth = pdfWidth;
-                        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                        
-                        // If image is taller than A4, scale it down
-                        if (imgHeight > pdfHeight) {
-                            const scale = pdfHeight / imgHeight;
-                            const scaledWidth = imgWidth * scale;
-                            const scaledHeight = pdfHeight;
-                            const xOffset = (pdfWidth - scaledWidth) / 2;
-                            
-                            pdf.addImage(imgData, 'PNG', xOffset, 0, scaledWidth, scaledHeight, '', 'FAST');
-                        } else {
-                            // Center the image vertically
-                            const yOffset = (pdfHeight - imgHeight) / 2;
-                            pdf.addImage(imgData, 'PNG', 0, yOffset, imgWidth, imgHeight, '', 'FAST');
-                        }
-                        
-                        pdf.save(filename);
-                        hideLoadingSpinner();
-                        incrementDownloadCount();
-                        showNotification('تم تحميل ملف PDF بنجاح', 'success');
-                    } catch (pdfError) {
-                        hideLoadingSpinner();
-                        console.error('PDF creation error:', pdfError);
-                        showNotification('حدث خطأ أثناء إنشاء ملف PDF', 'error');
-                    }
-                }).catch(canvasError => {
-                    hideLoadingSpinner();
-                    console.error('Canvas creation error:', canvasError);
-                    showNotification('حدث خطأ أثناء تحضير الصورة', 'error');
-                });
-            } catch (generalError) {
-                hideLoadingSpinner();
-                console.error('General PDF error:', generalError);
-                showNotification('حدث خطأ عام أثناء تحضير PDF', 'error');
-            }
-        }
-
-        function saveTemplate() {
-            if (!selectedFormType) {
-                showCustomAlert('يرجى اختيار نوع النموذج أولاً');
-                return;
-            }
-
-            const template = {
-                type: selectedFormType,
-                employeeName: document.getElementById('employeeName').value,
-                employeeId: document.getElementById('employeeId').value,
-                jobTitle: document.getElementById('jobTitle').value,
-                employeePhone: document.getElementById('employeePhone').value,
-                department: document.getElementById('department').value
+            const opt = {
+                margin: 0,
+                filename: `${docTitle} - ${empName}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2.5, useCORS: true, letterRendering: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            const templates = JSON.parse(localStorage.getItem('formTemplates') || '[]');
-            templates.push({
-                ...template,
-                id: Date.now(),
-                name: `قالب ${document.getElementById('employeeName').value || 'جديد'}`,
-                createdAt: new Date().toISOString()
-            });
-            
-            localStorage.setItem('formTemplates', JSON.stringify(templates));
-            showNotification('تم حفظ القالب بنجاح', 'success');
-        }
-
-        function clearForm() {
-            showConfirmDialog('هل أنت متأكد من مسح جميع البيانات؟', () => {
-                document.getElementById('employeeName').value = '';
-                document.getElementById('employeeId').value = '';
-                document.getElementById('jobTitle').value = '';
-                document.getElementById('employeePhone').value = '';
-                document.getElementById('department').value = '';
-                document.getElementById('formDate').value = '';
-                
-                document.getElementById('additionalFields').innerHTML = '';
-                document.getElementById('formFields').classList.add('hidden');
-                document.getElementById('printArea').classList.add('hidden');
-                
-                selectedFormType = '';
-                showNotification('تم مسح البيانات بنجاح', 'info');
+            html2pdf().set(opt).from(docElement).save().then(() => {
+                btn.innerHTML = '<i class="fa-solid fa-file-arrow-down"></i> حفظ كملف PDF';
+                document.getElementById('scaleContainer').style.transform = prevTransform;
             });
         }
 
-        function quickGenerate() {
-            if (!selectedFormType) {
-                showCustomAlert('يرجى اختيار نوع النموذج أولاً');
-                return;
+        // بدء التشغيل
+        window.addEventListener('load', () => {
+            initPageMeta();
+            initFormFields();
+            
+            // استرجاع الشعار المحفوظ إن وجد
+            const savedLogo = localStorage.getItem('savedUnifiedLogo');
+            if(savedLogo) {
+                document.getElementById('schoolMainLogo').src = savedLogo;
+                document.getElementById('watermarkImg').src = savedLogo;
             }
 
-            document.getElementById('employeeName').value = 'أحمد محمد الإماراتي';
-            document.getElementById('employeeId').value = '1234567890';
-            document.getElementById('jobTitle').value = 'معلم/ة';
-            document.getElementById('employeePhone').value = '+971 50 123 4567';
-            document.getElementById('department').value = 'قسم التدريس';
-            
-            generateForm();
-            showNotification('تم توليد النموذج بنجاح', 'success');
-        }
-
-        function showHelp() {
-            showInfoDialog(`
-                <h3 class="text-lg font-bold mb-4 text-primary">مساعدة استخدام التطبيق</h3>
-                <div class="text-sm space-y-3">
-                    <div><strong>1. اختيار النموذج:</strong> انقر على أي نموذج من النماذج المتاحة</div>
-                    <div><strong>2. ملء البيانات:</strong> أدخل بيانات الموظف والتفاصيل المطلوبة</div>
-                    <div><strong>3. اختيار نوع التوليد:</strong> 
-                        <br>- نموذج مملوء: سيحتوي على البيانات المدخلة
-                        <br>- نموذج فارغ: سيحتوي على حقول قابلة للتحرير
-                    </div>
-                    <div><strong>4. توليد النموذج:</strong> انقر على "توليد النموذج" لإنشاء النموذج</div>
-                    <div><strong>5. الطباعة:</strong> استخدم زر "طباعة" أو "تحميل PDF"</div>
-                    <div class="bg-blue-50 p-3 rounded">
-                        <strong class="text-blue-700">جديد:</strong> يمكن الآن توليد نماذج فارغة قابلة للتحرير ليقوم الموظف بملئها بنفسه
-                    </div>
-                    <div><strong>البحث:</strong> يمكنك البحث في النماذج باستخدام مربع البحث</div>
-                    <div><strong>التصفية:</strong> استخدم قائمة الفئات لتصفية النماذج</div>
-                    <div><strong>الإعدادات:</strong> يمكنك تعديل بيانات المدرسة من لوحة الإعدادات</div>
-                </div>
-            `);
-        }
-
-        function toggleTheme() {
-            document.documentElement.classList.toggle('dark');
-            showNotification('تم تغيير المظهر بنجاح', 'info');
-        }
-
-        function showLoadingSpinner(message) {
-            const spinner = document.createElement('div');
-            spinner.id = 'loadingSpinner';
-            spinner.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-            spinner.innerHTML = `
-                <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg text-center">
-                    <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
-                    <p class="text-gray-700 dark:text-gray-300">${message}</p>
-                </div>
-            `;
-            document.body.appendChild(spinner);
-        }
-
-        function hideLoadingSpinner() {
-            const spinner = document.getElementById('loadingSpinner');
-            if (spinner) {
-                spinner.remove();
-            }
-        }
-
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = `fixed top-4 left-4 p-4 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-x-full`;
-            
-            const colors = {
-                success: 'bg-green-500 text-white',
-                error: 'bg-red-500 text-white',
-                warning: 'bg-yellow-500 text-white',
-                info: 'bg-blue-500 text-white'
-            };
-            
-            const icons = {
-                success: 'fas fa-check-circle',
-                error: 'fas fa-exclamation-circle',
-                warning: 'fas fa-exclamation-triangle',
-                info: 'fas fa-info-circle'
-            };
-            
-            notification.className += ` ${colors[type]}`;
-            notification.innerHTML = `
-                <div class="flex items-center">
-                    <i class="${icons[type]} mr-2"></i>
-                    <span>${message}</span>
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.classList.remove('translate-x-full');
-            }, 100);
-            
-            setTimeout(() => {
-                notification.classList.add('translate-x-full');
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
-
-        function showCustomAlert(message) {
-            const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in';
-            modal.innerHTML = `
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-2xl max-w-md w-full mx-4 animate-slide-up">
-                    <div class="text-center">
-                        <div class="bg-warning bg-opacity-20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-exclamation-triangle text-warning text-2xl"></i>
-                        </div>
-                        <p class="text-gray-700 dark:text-gray-300 mb-6 text-lg">${message}</p>
-                        <button class="bg-primary text-white px-8 py-3 rounded-lg hover:bg-blue-600 transition-colors font-medium" onclick="this.closest('.fixed').remove()">
-                            موافق
-                        </button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        function showConfirmDialog(message, onConfirm) {
-            const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in';
-            modal.innerHTML = `
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-2xl max-w-md w-full mx-4 animate-slide-up">
-                    <div class="text-center">
-                        <div class="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-question-circle text-red-500 text-2xl"></i>
-                        </div>
-                        <p class="text-gray-700 dark:text-gray-300 mb-6 text-lg">${message}</p>
-                        <div class="flex justify-center space-x-4">
-                            <button class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors" onclick="this.closest('.fixed').remove()">
-                                إلغاء
-                            </button>
-                            <button class="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 transition-colors" onclick="this.closest('.fixed').remove(); (${onConfirm})();">
-                                تأكيد
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        function showInfoDialog(content) {
-            const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in';
-            modal.innerHTML = `
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-2xl max-w-lg w-full mx-4 animate-slide-up">
-                    <div>${content}</div>
-                    <div class="text-center mt-6">
-                        <button class="bg-primary text-white px-8 py-3 rounded-lg hover:bg-blue-600 transition-colors font-medium" onclick="this.closest('.fixed').remove()">
-                            إغلاق
-                        </button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        function printForm() {
-            if (document.getElementById('printArea').classList.contains('hidden')) {
-                showCustomAlert('يرجى توليد النموذج أولاً');
-                return;
-            }
-            window.print();
-            showNotification('تم إرسال النموذج للطباعة', 'info');
-        }
+            fitToWindow();
+            window.addEventListener('resize', fitToWindow);
+        });
     </script>
 </body>
 </html>
