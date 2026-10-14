@@ -346,8 +346,8 @@
         /* نص ومحتوى الوثيقة */
         .doc-core-content {
             flex: 1;
-            font-size: 1.02rem;
-            line-height: 2;
+            font-size: 0.98rem;
+            line-height: 1.9;
             color: #1e293b;
             text-align: justify;
             padding: 4px 4px;
@@ -370,6 +370,33 @@
             background: #fef2f2;
             border-right: 4px solid #ef4444;
             color: #991b1b;
+        }
+        .alert-info-style {
+            background: #f0fdf4;
+            border-right: 4px solid #059669;
+            color: #065f46;
+        }
+
+        /* جداول تفصيلية داخل المحتوى */
+        .doc-detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 0.86rem;
+            border: 1px solid #cbd5e1;
+        }
+        .doc-detail-table th {
+            background: #0f2744;
+            color: #fff;
+            padding: 7px 10px;
+            font-weight: 700;
+            border: 1px solid #0f2744;
+            text-align: right;
+        }
+        .doc-detail-table td {
+            padding: 7px 10px;
+            border: 1px solid #cbd5e1;
+            background: #fff;
         }
 
         /* منطقة التوقيع والختم المعتمد */
@@ -536,6 +563,7 @@
                         </optgroup>
                         <optgroup label="📄 النماذج الإدارية والمالية">
                             <option value="salary_cert" selected>شهادة راتب (لمن يهمه الأمر)</option>
+                            <option value="custody_receipt">إقرار واستلام عهدة رسمية (Handover)</option>
                             <option value="leave_req">طلب إجازة رسمية</option>
                             <option value="resume_work">إشعار مباشرة عمل</option>
                             <option value="clearance">شهادة إخلاء طرف وتسليم عهدة</option>
@@ -776,6 +804,45 @@
                         وقد قُدمت له هذه الشهادة بناءً على رغبته الشخصية لتقديمها إلى جهتكم الموقرة دون أن تتحمل المدرسة أي مسؤولية مالية أو كفالة تجاه الغير.
                     `;
                 }
+            },
+            // نموذج إقرار واستلام عهدة (جديد)
+            custody_receipt: {
+                title: "إقرار واستلام عهدة رسمية",
+                sigs: ["الموظف المستلم (المُقر)", "أمين المستودع / التقنية", "مدير الشؤون الإدارية والمالية"],
+                fields: [
+                    { id: "cust_date", label: "تاريخ استلام العهدة", type: "date" },
+                    { id: "cust_type", label: "تصنيف العهدة المستلمة", type: "select", options: ["أجهزة حاسوب وتقنية (Laptop / Tablet)", "معدات ومختبرات علمية", "مفاتيح وبطاقات دخول ومنشآت", "كتب ومناهج ووسائل تعليمية", "أثاث وأدوات مكتبية", "عهدة أخرى متفرقة"] },
+                    { id: "cust_condition", label: "حالة العهدة عند الاستلام", type: "select", options: ["جديدة وبحالة تشغيلية ممتازة (100%)", "مستعملة وبحالة جيدة جداً وخالية من العيوب", "بحالة جيدة وصالحة للعمل بكفاءة"] },
+                    { id: "cust_details", label: "بيان وتفاصيل العهدة (النوع، الموديل، الرقم التسلسلي S/N)", type: "textarea", placeholder: "مثال: جهاز حاسوب محمول HP ProBook مع الشاحن والحقيبة، الرقم التسلسلي: S/N: CND1234XYZ" },
+                    { id: "cust_purpose", label: "الغرض من الاستخدام", type: "text", placeholder: "مثال: إنجاز المهام التدريسية والإدارية المقررة" }
+                ],
+                render: (data) => `
+                    أقر أنا الموظف المذكورة بياناتي أعلاه بأنني قد استلمت من إدارة <strong>مدرسة الثروات الوطنية الخاصة</strong> العهدة الموضحة مواصفاتها تفصيلاً في الجدول أدناه، وذلك بتاريخ <strong>${formatDisplayDate(data.cust_date)}</strong>:
+                    <table class="doc-detail-table">
+                        <tr>
+                            <th style="width: 28%;">نوع وتصنيف العهدة</th>
+                            <td>${data.cust_type || 'أجهزة ومعدات رسمية'}</td>
+                        </tr>
+                        <tr>
+                            <th>حالة العهدة عند الفحص</th>
+                            <td>${data.cust_condition || 'جديدة وبحالة ممتازة'}</td>
+                        </tr>
+                        <tr>
+                            <th>الغرض من الصرف</th>
+                            <td>${data.cust_purpose || 'الاستخدام الرسمي في نطاق مهام العمل المدرسي'}</td>
+                        </tr>
+                        <tr>
+                            <th>بيان العهدة والمواصفات والأرقام التسلسلية (S/N)</th>
+                            <td style="font-weight: 700; color: #0f2744; line-height: 1.6;">
+                                ${data.cust_details ? data.cust_details.replace(/\n/g, '<br>') : 'جهاز حاسوب محمول وملحقاته بحالة سليمة وجاهزة للعمل.'}
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="alert-box alert-info-style">
+                        <strong>التعهد والإقرار القانوني:</strong><br>
+                        أتعهد بالمحافظة التامة على هذه العهدة واستخدامها فقط لأغراض العمل المدرسي المحددة، وعدم إعارتها أو تسليمها لأي طرف ثالث، وأتحمل المسؤولية القانونية والمالية الكاملة عن أي تلف ناتج عن سوء الاستخدام أو إهمال أو فقدان، كما ألتزم بردها إلى إدارة المدرسة فور طلبها أو عند انتهاء/إنهاء علاقة العمل بالمؤسسة بنفس الحالة التي استلمتها بها.
+                    </div>
+                `
             },
             leave_req: {
                 title: "طلب إجازة رسمية",
